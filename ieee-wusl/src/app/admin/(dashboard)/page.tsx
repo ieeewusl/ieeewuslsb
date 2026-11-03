@@ -73,7 +73,7 @@ export default async function AdminDashboardPage() {
     { label: 'New Event', href: '/admin/events/new', icon: Calendar },
     { label: 'New Article', href: '/admin/news/new', icon: Newspaper },
     { label: 'Add Team Member', href: '/admin/team/new', icon: Users },
-    { label: 'New Project', href: '/admin/projects/new', icon: Code2 },
+    { label: 'New Album', href: '/admin/gallery/new', icon: Image },
   ]
 
   const recentActivity = [

@@ -27,7 +27,6 @@ const navItems = [
   { label: 'Team', href: '/admin/team', icon: Users },
   { label: 'Chapters', href: '/admin/chapters', icon: Cpu },
   { label: 'News', href: '/admin/news', icon: Newspaper },
-  { label: 'Projects', href: '/admin/projects', icon: Code2 },
   { label: 'Gallery', href: '/admin/gallery', icon: Image },
   { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['super_admin', 'administrator'] },
   { label: 'Users', href: '/admin/users', icon: UserCog, roles: ['super_admin'] },
