@@ -1,0 +1,12 @@
+{
+  "name": "ieee-student-branch-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm --prefix ieee-wusl run dev",
+    "build": "npm --prefix ieee-wusl run build",
+    "start": "npm --prefix ieee-wusl run start",
+    "lint": "npm --prefix ieee-wusl run lint"
+  }
+}
+
