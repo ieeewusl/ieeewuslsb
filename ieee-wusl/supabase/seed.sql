@@ -21,6 +21,9 @@ INSERT INTO public.site_settings (key, value, description) VALUES
   ('social_youtube', '"https://www.youtube.com/@ieeewusl"', 'Official YouTube channel')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
 
+-- Clean existing demo rows to avoid duplicate key errors on re-runs
+TRUNCATE TABLE public.gallery_images, public.gallery_albums, public.projects, public.events, public.team_members, public.chapters, public.committee_terms CASCADE;
+
 -- 2. COMMITTEE TERMS
 INSERT INTO public.committee_terms (id, label, start_year, end_year, is_current) VALUES
   ('11111111-1111-1111-1111-111111111111', '2024/2025', 2024, 2025, TRUE),

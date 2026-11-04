@@ -598,18 +598,3 @@ CREATE POLICY "audit_logs_admin_read" ON public.audit_logs
 
 CREATE POLICY "audit_logs_service_insert" ON public.audit_logs
   FOR INSERT TO authenticated WITH CHECK (TRUE);
-
--- ============================================================
--- SEED DATA (Development / Demo)
--- ============================================================
-
--- Committee Term
-INSERT INTO public.committee_terms (label, start_year, end_year, is_current) VALUES
-  ('2024/2025', 2024, 2025, TRUE);
-
--- Chapters
-INSERT INTO public.chapters (name, slug, short_desc, status, display_order) VALUES
-  ('Computer Society', 'computer-society', 'Advancing knowledge of computer science and engineering.', 'published', 1),
-  ('Robotics and Automation Society', 'robotics-automation', 'Exploring intelligent systems and automation.', 'published', 2),
-  ('Women in Engineering', 'women-in-engineering', 'Empowering women in engineering and technology.', 'published', 3),
-  ('Power and Energy Society', 'power-energy', 'Driving innovation in sustainable energy systems.', 'published', 4);
