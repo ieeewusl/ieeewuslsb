@@ -2,6 +2,12 @@
   command = "npm run build"
   publish = ".next"
 
+[build.environment]
+  # NEXT_PUBLIC_* values are intentionally inlined into the browser bundle by
+  # Next.js. The Supabase anon key is a public key (access is enforced by Row
+  # Level Security), so exclude these from Netlify's secrets scanning.
+  # Server-only secrets such as SUPABASE_SERVICE_ROLE_KEY remain scanned.
+  SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_SUPABASE_ANON_KEY,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SITE_URL"
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
-
