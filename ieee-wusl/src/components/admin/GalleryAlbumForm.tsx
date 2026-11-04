@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { PublicationStatus, GalleryAlbum } from '@/types/database'
+import ImageUpload from './ImageUpload'
 
 interface GalleryAlbumFormProps {
   initialData?: Partial<GalleryAlbum> & { id?: string }
@@ -46,7 +47,7 @@ export default function GalleryAlbumForm({ initialData, mode }: GalleryAlbumForm
     setError(null)
 
     if (!form.title.trim() || !form.slug.trim()) {
-      setError('Title and slug are required.')
+      setError('Album title and slug are required.')
       return
     }
 
@@ -108,7 +109,7 @@ export default function GalleryAlbumForm({ initialData, mode }: GalleryAlbumForm
             <input
               type="text"
               required
-              placeholder="e.g. Annual General Meeting 2024"
+              placeholder="e.g. Annual Tech Symposium 2024"
               value={form.title}
               onChange={handleTitleChange}
               className="input"
@@ -120,7 +121,7 @@ export default function GalleryAlbumForm({ initialData, mode }: GalleryAlbumForm
             <input
               type="text"
               required
-              placeholder="agm-2024"
+              placeholder="annual-tech-symposium-2024"
               value={form.slug}
               onChange={e => set('slug', slugify(e.target.value))}
               className="input font-mono text-sm"
@@ -139,27 +140,25 @@ export default function GalleryAlbumForm({ initialData, mode }: GalleryAlbumForm
           />
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
-          <div>
-            <label className="label">Cover Image URL</label>
-            <input
-              type="url"
-              placeholder="https://..."
-              value={form.cover_url}
-              onChange={e => set('cover_url', e.target.value)}
-              className="input"
-            />
-          </div>
+        <div>
+          <ImageUpload
+            label="Cover Photo"
+            value={form.cover_url}
+            onChange={url => set('cover_url', url)}
+            folder="gallery"
+            description="Upload cover image for this album (PNG, JPG, WEBP)"
+            aspectRatio="wide"
+          />
+        </div>
 
-          <div>
-            <label className="label">Event Date</label>
-            <input
-              type="date"
-              value={form.event_date}
-              onChange={e => set('event_date', e.target.value)}
-              className="input"
-            />
-          </div>
+        <div>
+          <label className="label">Event Date</label>
+          <input
+            type="date"
+            value={form.event_date}
+            onChange={e => set('event_date', e.target.value)}
+            className="input"
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 pt-3 border-t border-[var(--color-border)]">
@@ -172,7 +171,7 @@ export default function GalleryAlbumForm({ initialData, mode }: GalleryAlbumForm
               className="input"
             />
             <span className="text-xs text-[var(--color-muted)] mt-1 block">
-              Lower numbers appear first in the gallery.
+              Lower numbers appear first in the public gallery.
             </span>
           </div>
 

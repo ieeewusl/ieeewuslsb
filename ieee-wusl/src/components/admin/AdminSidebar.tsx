@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import {
@@ -9,11 +10,10 @@ import {
   Users,
   Cpu,
   Newspaper,
-  Code2,
-  Image,
+  Image as ImageIcon,
   Settings,
   UserCog,
-  Zap,
+  Globe,
   Menu,
   X,
   ChevronRight,
@@ -27,45 +27,50 @@ const navItems = [
   { label: 'Team', href: '/admin/team', icon: Users },
   { label: 'Chapters', href: '/admin/chapters', icon: Cpu },
   { label: 'News', href: '/admin/news', icon: Newspaper },
-  { label: 'Gallery', href: '/admin/gallery', icon: Image },
+  { label: 'Gallery', href: '/admin/gallery', icon: ImageIcon },
   { label: 'Settings', href: '/admin/settings', icon: Settings, roles: ['super_admin', 'administrator'] },
   { label: 'Users', href: '/admin/users', icon: UserCog, roles: ['super_admin'] },
 ]
 
-export default function AdminSidebar({ userRole }: { userRole: UserRole }) {
-  const pathname = usePathname()
-  const [mobileOpen, setMobileOpen] = useState(false)
+interface SidebarContentProps {
+  items: typeof navItems
+  pathname: string
+  onNavigate?: () => void
+}
 
-  const visibleItems = navItems.filter(item =>
-    !item.roles || item.roles.includes(userRole)
-  )
-
+function SidebarContent({ items, pathname, onNavigate }: SidebarContentProps) {
   const isActive = (href: string) => {
     if (href === '/admin') return pathname === '/admin'
     return pathname.startsWith(href)
   }
 
-  const SidebarContent = () => (
+  return (
     <div className="flex flex-col h-full">
       {/* Logo */}
-      <div className="flex items-center gap-3 p-5 border-b border-[var(--color-border)]">
-        <div className="w-9 h-9 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
-          <Zap className="w-5 h-5 text-white" fill="currentColor" />
-        </div>
-        <div className="leading-tight">
-          <div className="text-sm font-bold text-[var(--color-text)]">IEEE WUSL</div>
-          <div className="text-xs text-[var(--color-muted)]">Admin Dashboard</div>
+      <div className="p-4 border-b border-[var(--color-border)]">
+        <Link href="/admin" className="block" onClick={onNavigate}>
+          <Image
+            src="/wusl-sb-logo.png"
+            alt="IEEE WUSL Student Branch Logo"
+            width={220}
+            height={36}
+            className="h-8 w-auto max-w-[210px] object-contain"
+            priority
+          />
+        </Link>
+        <div className="text-[10px] font-semibold tracking-wider uppercase text-[var(--color-muted)] mt-1.5 px-0.5">
+          Admin Dashboard
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-3" aria-label="Admin navigation">
         <div className="space-y-0.5">
-          {visibleItems.map(({ label, href, icon: Icon }) => (
+          {items.map(({ label, href, icon: Icon }) => (
             <Link
               key={href}
               href={href}
-              onClick={() => setMobileOpen(false)}
+              onClick={onNavigate}
               className={cn(
                 'flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all',
                 isActive(href)
@@ -90,18 +95,27 @@ export default function AdminSidebar({ userRole }: { userRole: UserRole }) {
           target="_blank"
           className="flex items-center gap-2 px-3.5 py-2.5 rounded-xl text-xs text-[var(--color-muted)] hover:text-[var(--color-text)] hover:bg-[var(--color-surface-2)] transition-all"
         >
-          <Zap className="w-3.5 h-3.5" />
+          <Globe className="w-3.5 h-3.5" />
           View Public Site
         </Link>
       </div>
     </div>
+  )
+}
+
+export default function AdminSidebar({ userRole }: { userRole: UserRole }) {
+  const pathname = usePathname()
+  const [mobileOpen, setMobileOpen] = useState(false)
+
+  const visibleItems = navItems.filter(item =>
+    !item.roles || item.roles.includes(userRole)
   )
 
   return (
     <>
       {/* Desktop sidebar */}
       <aside className="hidden lg:flex fixed top-0 left-0 bottom-0 w-64 bg-white border-r border-[var(--color-border)] z-30 flex-col">
-        <SidebarContent />
+        <SidebarContent items={visibleItems} pathname={pathname} />
       </aside>
 
       {/* Mobile trigger */}
@@ -119,12 +133,18 @@ export default function AdminSidebar({ userRole }: { userRole: UserRole }) {
           <div className="absolute inset-0 bg-black/50" onClick={() => setMobileOpen(false)} />
           <aside className="absolute top-0 left-0 bottom-0 w-64 bg-white shadow-2xl flex flex-col">
             <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
-              <span className="font-bold text-[var(--color-text)] text-sm">Navigation</span>
+              <Image
+                src="/wusl-sb-logo.png"
+                alt="IEEE WUSL Logo"
+                width={180}
+                height={30}
+                className="h-7 w-auto object-contain"
+              />
               <button onClick={() => setMobileOpen(false)} className="p-1.5 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-muted)]">
                 <X className="w-4 h-4" />
               </button>
             </div>
-            <SidebarContent />
+            <SidebarContent items={visibleItems} pathname={pathname} onNavigate={() => setMobileOpen(false)} />
           </aside>
         </div>
       )}

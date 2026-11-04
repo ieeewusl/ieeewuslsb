@@ -1,9 +1,10 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { Zap, Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
+import { Eye, EyeOff, Loader2, AlertCircle } from 'lucide-react'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
@@ -36,11 +37,18 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-md">
         {/* Brand */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-[var(--color-primary)] shadow-lg mb-4">
-            <Zap className="w-7 h-7 text-white" fill="currentColor" />
+          <div className="inline-flex items-center justify-center p-4 rounded-2xl bg-white shadow-sm border border-[var(--color-border)] mb-4">
+            <Image
+              src="/wusl-sb-logo.png"
+              alt="IEEE WUSL Student Branch"
+              width={260}
+              height={40}
+              className="h-10 w-auto object-contain"
+              priority
+            />
           </div>
           <h1 className="text-2xl font-bold text-[var(--color-text)]">Admin Dashboard</h1>
-          <p className="text-sm text-[var(--color-muted)] mt-1">IEEE Student Branch WUSL</p>
+          <p className="text-sm text-[var(--color-muted)] mt-1">Wayamba University of Sri Lanka</p>
         </div>
 
         {/* Card */}

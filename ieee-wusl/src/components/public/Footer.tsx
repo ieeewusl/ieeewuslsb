@@ -1,5 +1,6 @@
+import Image from 'next/image'
 import Link from 'next/link'
-import { Zap, Mail, MapPin, ExternalLink } from 'lucide-react'
+import { Mail, MapPin, ExternalLink } from 'lucide-react'
 import { LinkedinIcon, FacebookIcon, InstagramIcon, TwitterIcon, YoutubeIcon } from '@/components/ui/SocialIcons'
 
 const footerLinks = {
@@ -56,14 +57,14 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8">
           {/* Brand column */}
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-flex items-center gap-2.5 mb-5">
-              <div className="w-10 h-10 rounded-xl bg-[var(--color-primary)] flex items-center justify-center">
-                <Zap className="w-5 h-5 text-white" fill="currentColor" />
-              </div>
-              <div className="leading-tight">
-                <span className="block font-bold text-white text-lg">IEEE WUSL</span>
-                <span className="block text-white/60 text-xs">Student Branch</span>
-              </div>
+            <Link href="/" className="inline-block mb-5" aria-label="IEEE WUSL Home">
+              <Image
+                src="/wusl-sb-logo-white.png"
+                alt="IEEE Student Branch Wayamba University of Sri Lanka"
+                width={280}
+                height={44}
+                className="h-10 md:h-11 w-auto max-w-[280px] object-contain"
+              />
             </Link>
             <p className="text-white/60 text-sm leading-relaxed max-w-xs mb-6">
               Connecting engineers, driving innovation, and building the future of technology at Wayamba University of Sri Lanka.

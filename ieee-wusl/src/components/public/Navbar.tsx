@@ -1,9 +1,10 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ChevronDown, Zap } from 'lucide-react'
+import { Menu, X, ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navLinks = [
@@ -37,10 +38,12 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname)
     setMobileOpen(false)
     setActiveDropdown(null)
-  }, [pathname])
+  }
 
   useEffect(() => {
     if (mobileOpen) {
@@ -71,35 +74,17 @@ export default function Navbar() {
             {/* Logo */}
             <Link
               href="/"
-              className="flex items-center gap-2.5 group"
-              aria-label="IEEE WUSL Home"
+              className="flex items-center group py-2"
+              aria-label="IEEE WUSL Student Branch Home"
             >
-              <div className={cn(
-                'w-9 h-9 rounded-lg flex items-center justify-center transition-colors duration-200',
-                scrolled ? 'bg-[var(--color-primary)]' : 'bg-white/20 backdrop-blur-sm'
-              )}>
-                <Zap
-                  className={cn(
-                    'w-5 h-5 transition-colors',
-                    scrolled ? 'text-white' : 'text-white'
-                  )}
-                  fill="currentColor"
-                />
-              </div>
-              <div className="leading-tight">
-                <span className={cn(
-                  'block font-bold text-base tracking-tight transition-colors',
-                  scrolled ? 'text-[var(--color-navy)]' : 'text-white'
-                )}>
-                  IEEE WUSL
-                </span>
-                <span className={cn(
-                  'block text-[0.6875rem] transition-colors leading-tight',
-                  scrolled ? 'text-[var(--color-muted)]' : 'text-white/70'
-                )}>
-                  Student Branch
-                </span>
-              </div>
+              <Image
+                src={scrolled ? '/wusl-sb-logo.png' : '/wusl-sb-logo-white.png'}
+                alt="IEEE Student Branch Wayamba University of Sri Lanka"
+                width={260}
+                height={40}
+                className="h-8 sm:h-9 md:h-10 w-auto max-w-[200px] sm:max-w-[250px] md:max-w-[290px] object-contain transition-all duration-300"
+                priority
+              />
             </Link>
 
             {/* Desktop Nav */}
@@ -224,12 +209,16 @@ export default function Navbar() {
           {/* Panel */}
           <div className="absolute top-0 right-0 bottom-0 w-80 bg-white shadow-2xl flex flex-col">
             {/* Header */}
-            <div className="flex items-center justify-between p-5 border-b border-[var(--color-border)]">
-              <Link href="/" className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-[var(--color-primary)] flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" fill="currentColor" />
-                </div>
-                <span className="font-bold text-[var(--color-navy)]">IEEE WUSL</span>
+            <div className="flex items-center justify-between p-4 border-b border-[var(--color-border)]">
+              <Link href="/" className="flex items-center">
+                <Image
+                  src="/wusl-sb-logo.png"
+                  alt="IEEE WUSL Student Branch"
+                  width={200}
+                  height={32}
+                  className="h-8 w-auto object-contain"
+                  priority
+                />
               </Link>
               <button
                 onClick={() => setMobileOpen(false)}
@@ -265,8 +254,8 @@ export default function Navbar() {
                               className={cn(
                                 'flex items-center px-3 py-2.5 rounded-lg text-sm transition-colors',
                                 isActive(child.href)
-                                  ? 'text-[var(--color-primary)] font-medium'
-                                  : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
+                                ? 'text-[var(--color-primary)] font-medium'
+                                : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
                               )}
                             >
                               {child.label}

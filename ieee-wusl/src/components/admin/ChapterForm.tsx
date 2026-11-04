@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { PublicationStatus, Chapter } from '@/types/database'
+import ImageUpload from './ImageUpload'
 
 interface ChapterFormProps {
   initialData?: Partial<Chapter> & { id?: string }
@@ -154,7 +155,7 @@ export default function ChapterForm({ initialData, mode }: ChapterFormProps) {
           />
         </div>
 
-        <div className="grid md:grid-cols-3 gap-4">
+        <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="label">Founded Year</label>
             <input
@@ -176,17 +177,17 @@ export default function ChapterForm({ initialData, mode }: ChapterFormProps) {
               className="input"
             />
           </div>
+        </div>
 
-          <div>
-            <label className="label">Logo Image URL</label>
-            <input
-              type="url"
-              placeholder="https://..."
-              value={form.logo_url}
-              onChange={e => set('logo_url', e.target.value)}
-              className="input"
-            />
-          </div>
+        <div>
+          <ImageUpload
+            label="Chapter Logo"
+            value={form.logo_url}
+            onChange={url => set('logo_url', url)}
+            folder="chapters"
+            description="Upload official chapter emblem or logo (PNG or SVG recommended)"
+            aspectRatio="wide"
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 pt-3 border-t border-[var(--color-border)]">

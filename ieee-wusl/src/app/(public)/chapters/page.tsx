@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Cpu, ChevronRight } from 'lucide-react'
+import { Cpu, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import type { Chapter } from '@/types/database'
+import { mockChapters } from '@/lib/mock-data'
 
 export const metadata: Metadata = {
   title: 'Technical Chapters',
@@ -11,8 +12,6 @@ export const metadata: Metadata = {
 }
 
 export const revalidate = 60
-
-import { mockChapters } from '@/lib/mock-data'
 
 async function getChapters(): Promise<Chapter[]> {
   try {
@@ -67,9 +66,15 @@ export default async function ChaptersPage() {
                 const gradient = chapterGradients[chapter.slug] ?? 'from-blue-600 to-blue-900'
                 return (
                   <Link key={chapter.id} href={`/chapters/${chapter.slug}`} className="card group flex gap-6 p-6 md:p-8">
-                    <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg`}>
-                      <Cpu className="w-8 h-8 text-white" />
-                    </div>
+                    {chapter.logo_url ? (
+                      <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 p-2 bg-white border border-[var(--color-border)] shadow-md flex items-center justify-center">
+                        <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-2" />
+                      </div>
+                    ) : (
+                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg`}>
+                        <Cpu className="w-8 h-8 text-white" />
+                      </div>
+                    )}
                     <div className="flex-1">
                       <h2 className="text-lg font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
                         IEEE {chapter.name}

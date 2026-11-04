@@ -126,9 +126,15 @@ export default async function HomePage() {
         <div className="container relative z-10 py-32 md:py-40">
           <div className="max-w-3xl">
             {/* Branch label */}
-            <div className="inline-flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-sm border border-white/20">
-              <Zap className="w-3.5 h-3.5 text-[var(--color-accent)]" fill="currentColor" />
-              <span className="text-xs font-semibold text-white/90 tracking-wider uppercase">
+            <div className="inline-flex items-center gap-2.5 mb-6 px-4 py-2 rounded-full bg-white/10 backdrop-blur-md border border-white/20">
+              <Image
+                src="/wusl-sb-emblem.png"
+                alt="IEEE"
+                width={20}
+                height={20}
+                className="h-5 w-auto object-contain brightness-0 invert"
+              />
+              <span className="text-xs font-semibold text-white tracking-wider uppercase">
                 IEEE Student Branch · Wayamba University of Sri Lanka
               </span>
             </div>
@@ -175,15 +181,19 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/40">
-          <div className="w-px h-10 bg-gradient-to-b from-transparent to-white/40" />
-          <span className="text-xs tracking-widest uppercase">Scroll</span>
-        </div>
+        {/* Scroll indicator with smooth scrolling */}
+        <a
+          href="#intro-heading"
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50 hover:text-white transition-all group cursor-pointer"
+          aria-label="Scroll to content"
+        >
+          <div className="w-px h-10 bg-gradient-to-b from-transparent to-white/50 group-hover:to-white group-hover:h-12 transition-all" />
+          <span className="text-xs tracking-widest uppercase group-hover:tracking-wider transition-all">Scroll</span>
+        </a>
       </section>
 
       {/* ── INTRO / MISSION ── */}
-      <section className="section" aria-labelledby="intro-heading">
+      <section className="section" id="intro" aria-labelledby="intro-heading">
         <div className="container">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             <div>
@@ -199,53 +209,35 @@ export default async function HomePage() {
               <p className="text-[var(--color-muted)] leading-relaxed mb-8">
                 From cutting-edge technical workshops and hackathons to robotics competitions and industry visits, we provide the platform for every engineering student to grow, connect, and excel.
               </p>
-              <div className="grid grid-cols-2 gap-4 mb-8">
-                {[
-                  { icon: Award, title: 'IEEE Affiliated', desc: 'Recognized IEEE Student Branch' },
-                  { icon: Globe, title: 'Global Network', desc: '420,000+ IEEE members worldwide' },
-                  { icon: Users, title: 'Community First', desc: 'Inclusive, collaborative culture' },
-                  { icon: Cpu, title: 'Tech Focused', desc: 'Hands-on technical programs' },
-                ].map(({ icon: Icon, title, desc }) => (
-                  <div key={title} className="flex items-start gap-3 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
-                    <div className="w-9 h-9 rounded-lg bg-[var(--color-primary)]/10 flex items-center justify-center shrink-0">
-                      <Icon className="w-4.5 h-4.5 text-[var(--color-primary)]" />
-                    </div>
-                    <div>
-                      <div className="text-sm font-semibold text-[var(--color-text)]">{title}</div>
-                      <div className="text-xs text-[var(--color-muted)] mt-0.5">{desc}</div>
-                    </div>
-                  </div>
-                ))}
+              <div className="flex flex-wrap gap-4">
+                <Link href="/about" className="btn btn-outline">
+                  About IEEE WUSL
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link href="/team" className="btn btn-white-outline" style={{ color: 'var(--color-primary)', borderColor: 'var(--color-border)' }}>
+                  Meet the Team
+                </Link>
               </div>
-              <Link href="/about" className="btn btn-primary">
-                Our Story <ArrowRight className="w-4 h-4" />
-              </Link>
             </div>
 
-            {/* Image composition */}
             <div className="relative">
               <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3]">
                 <Image
                   src="/about.jpg"
-                  alt="Students attending an IEEE workshop at Wayamba University"
+                  alt="Wayamba University campus and students"
                   fill
                   className="object-cover"
                 />
               </div>
-              {/* Floating card */}
-              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-xl p-5 border border-[var(--color-border)] max-w-[220px]">
-                <div className="flex items-center gap-3 mb-2">
-                  <div className="w-10 h-10 rounded-full bg-[var(--color-accent)]/10 flex items-center justify-center">
-                    <Flame className="w-5 h-5 text-[var(--color-accent)]" />
-                  </div>
-                  <div>
-                    <div className="text-sm font-bold text-[var(--color-text)]">Active Branch</div>
-                    <div className="text-xs text-[var(--color-muted)]">2024/2025</div>
-                  </div>
+              {/* Floating stat card */}
+              <div className="absolute -bottom-6 -left-6 bg-white rounded-2xl p-5 shadow-xl border border-[var(--color-border)] hidden sm:flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 text-[var(--color-primary)] flex items-center justify-center font-bold text-lg">
+                  <Award className="w-6 h-6" />
                 </div>
-                <p className="text-xs text-[var(--color-muted)] leading-relaxed">
-                  Recognized IEEE Student Branch in Sri Lanka Section.
-                </p>
+                <div>
+                  <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider">Region 10</div>
+                  <div className="font-bold text-[var(--color-text)]">Active SB Community</div>
+                </div>
               </div>
               {/* Accent decoration */}
               <div className="absolute -top-4 -right-4 w-20 h-20 rounded-2xl bg-[var(--color-primary)]/10 border-2 border-[var(--color-primary)]/20 -z-10" />
@@ -278,9 +270,15 @@ export default async function HomePage() {
                       href={`/chapters/${chapter.slug}`}
                       className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform"
                     >
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                        <Icon className="w-6 h-6 text-white" />
-                      </div>
+                      {chapter.logo_url ? (
+                        <div className="relative w-12 h-12 rounded-xl overflow-hidden mb-4 p-1.5 bg-white border border-[var(--color-border)] shadow-sm flex items-center justify-center">
+                          <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-1" />
+                        </div>
+                      ) : (
+                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                      )}
                       <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
                         IEEE {chapter.name}
                       </h3>
@@ -320,7 +318,8 @@ export default async function HomePage() {
 
           <div className="text-center mt-10">
             <Link href="/chapters" className="btn btn-outline">
-              View All Chapters <ArrowRight className="w-4 h-4" />
+              View All Technical Chapters
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -329,264 +328,303 @@ export default async function HomePage() {
       {/* ── UPCOMING EVENTS ── */}
       <section className="section" aria-labelledby="events-heading">
         <div className="container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
-              <div className="section-label">Events</div>
-              <h2 id="events-heading" className="section-title mb-2">
-                What&apos;s happening
-              </h2>
-              <p className="section-desc">
-                Stay connected with our upcoming workshops, seminars, and competitions.
-              </p>
+              <div className="section-label">Events & Activities</div>
+              <h2 id="events-heading" className="section-title mb-0">What&apos;s happening next</h2>
             </div>
-            <Link href="/events" className="btn btn-outline shrink-0">
-              All Events <ArrowRight className="w-4 h-4" />
+            <Link href="/events" className="btn btn-outline self-start md:self-auto">
+              All Events
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          {events.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              {events.map((event, i) => {
-                const past = isEventPast(event.end_at, event.start_at)
-                return (
-                  <Link key={event.id} href={`/events/${event.slug}`} className="card group flex flex-col">
-                    <div className="relative aspect-[16/9] overflow-hidden">
-                      {event.cover_url ? (
-                        <Image src={event.cover_url} alt={event.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {events.map((event) => {
+              const isPast = isEventPast(event.end_at, event.start_at)
+              return (
+                <article key={event.id} className="card group flex flex-col">
+                  {/* Card header */}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <span className="badge badge-primary">{event.category}</span>
+                      {isPast ? (
+                        <span className="badge badge-muted">Past</span>
                       ) : (
-                        <div className={`w-full h-full bg-gradient-to-br ${i % 2 === 0 ? 'from-blue-600 to-blue-900' : 'from-purple-600 to-purple-900'} flex items-center justify-center`}>
-                          <Calendar className="w-10 h-10 text-white/40" />
-                        </div>
+                        <span className="badge badge-success">Upcoming</span>
                       )}
-                      <div className="absolute top-3 left-3">
-                        <span className={`badge ${past ? 'badge-muted' : 'badge-accent'}`}>
-                          {past ? 'Past' : 'Upcoming'}
-                        </span>
-                      </div>
                     </div>
-                    <div className="p-5 flex flex-col flex-1">
-                      <h3 className="font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+
+                    <h3 className="text-lg font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                      <Link href={`/events/${event.slug}`}>
                         {event.title}
-                      </h3>
-                      {event.summary && (
-                        <p className="text-sm text-[var(--color-muted)] line-clamp-2 mb-4 flex-1">
-                          {event.summary}
-                        </p>
-                      )}
-                      <div className="space-y-1.5 mt-auto">
-                        <div className="flex items-center gap-2 text-xs text-[var(--color-muted)]">
-                          <Clock className="w-3.5 h-3.5" />
-                          {formatDateTime(event.start_at)}
-                        </div>
-                        {event.venue && (
-                          <div className="flex items-center gap-2 text-xs text-[var(--color-muted)]">
-                            <MapPin className="w-3.5 h-3.5" />
-                            {event.venue}
-                          </div>
-                        )}
+                      </Link>
+                    </h3>
+
+                    <p className="text-sm text-[var(--color-muted)] leading-relaxed mb-4 flex-1">
+                      {event.summary}
+                    </p>
+
+                    <div className="space-y-2 pt-4 border-t border-[var(--color-border)] text-xs text-[var(--color-muted)]">
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
+                        <span>{formatDateTime(event.start_at)}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-3.5 h-3.5 text-[var(--color-primary)] shrink-0" />
+                        <span>{event.is_online ? 'Online Event' : (event.venue ?? 'WUSL Campus')}</span>
                       </div>
                     </div>
-                  </Link>
-                )
-              })}
-            </div>
-          ) : (
-            <div className="text-center py-20 rounded-2xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-surface)]">
-              <Calendar className="w-12 h-12 text-[var(--color-muted-light)] mx-auto mb-4" />
-              <h3 className="text-lg font-semibold text-[var(--color-text)] mb-2">Events coming soon</h3>
-              <p className="text-[var(--color-muted)] text-sm max-w-sm mx-auto">
-                Check back soon for upcoming workshops, seminars, and competitions.
-              </p>
-            </div>
-          )}
+                  </div>
+
+                  {/* Card footer */}
+                  <div className="px-6 py-4 bg-[var(--color-surface)] border-t border-[var(--color-border)] flex items-center justify-between">
+                    <Link
+                      href={`/events/${event.slug}`}
+                      className="text-xs font-semibold text-[var(--color-primary)] hover:underline inline-flex items-center gap-1"
+                    >
+                      Details & Registration
+                      <ChevronRight className="w-3 h-3" />
+                    </Link>
+                    {event.registration_url && !isPast && (
+                      <a
+                        href={event.registration_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn btn-primary btn-sm py-1 px-3 text-xs"
+                      >
+                        Register
+                      </a>
+                    )}
+                  </div>
+                </article>
+              )
+            })}
+          </div>
         </div>
       </section>
 
-      {/* ── ROBOTICS / DARK FEATURE ── */}
-      <section className="section-dark section" aria-label="Innovation highlight">
-        <div className="container">
-          <div className="grid lg:grid-cols-2 gap-16 items-center">
-            <div className="relative order-2 lg:order-1">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-square max-w-md mx-auto">
-                <Image src="/robotics.jpg" alt="Student-built robotics arm in the lab" fill className="object-cover" />
+      {/* ── ROBOTICS & FLAGSHIP HIGHLIGHT ── */}
+      <section className="section section-dark overflow-hidden relative">
+        <div
+          className="absolute inset-0 opacity-15"
+          style={{
+            backgroundImage: `radial-gradient(circle at 80% 50%, rgba(242,140,40,0.3) 0%, transparent 60%)`,
+          }}
+        />
+        <div className="container relative">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <div className="section-label" style={{ color: 'var(--color-accent)' }}>
+                <span>Flagship Activities</span>
               </div>
-              <div className="absolute -top-5 -right-5 w-32 h-32 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm -z-10" />
-            </div>
-            <div className="order-1 lg:order-2">
-              <div className="section-label">Innovation</div>
-              <h2 className="section-title text-white mb-6">
-                Building real things that matter.
+              <h2 className="text-white text-3xl md:text-4xl font-bold mb-6">
+                Where engineering meets competition and creativity.
               </h2>
-              <p className="text-white/65 text-lg leading-relaxed mb-6">
-                Our Robotics and Automation chapter has pioneered autonomous systems, industrial automation projects, and AI-driven solutions right here in Sri Lanka.
+              <p className="text-white/70 text-lg leading-relaxed mb-6">
+                From national robotics competitions to inter-university hackathons, IEEE WUSL members regularly design, build, and deploy cutting-edge engineering solutions.
               </p>
-              <p className="text-white/55 leading-relaxed mb-8">
-                From competition robots to industry-partnered prototypes, our members gain hands-on experience that prepares them for world-class engineering careers.
-              </p>
-              <div className="grid grid-cols-2 gap-4 mb-8">
+              <div className="space-y-4 mb-8">
                 {[
-                  { value: '10+', label: 'Projects Built' },
-                  { value: '3+', label: 'Competition Wins' },
-                  { value: '60+', label: 'Chapter Members' },
-                  { value: '5+', label: 'Industry Partners' },
-                ].map((s) => (
-                  <div key={s.label} className="p-4 rounded-xl bg-white/6 border border-white/10">
-                    <div className="text-2xl font-bold text-[var(--color-bright-light)]">{s.value}</div>
-                    <div className="text-sm text-white/55">{s.label}</div>
+                  { title: 'Annual Robotics Symposium', desc: 'Autonomous robotics challenge open to all Sri Lankan university teams.' },
+                  { title: 'WUSL Hackathon Series', desc: '48-hour software and hardware sprint solving national industrial problems.' },
+                  { title: 'WIE Leadership Summit', desc: 'Empowering women engineers with leadership skills and industry networks.' },
+                ].map((item) => (
+                  <div key={item.title} className="flex items-start gap-3">
+                    <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] flex items-center justify-center shrink-0 mt-0.5">
+                      <Flame className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <div className="font-semibold text-white text-sm">{item.title}</div>
+                      <div className="text-white/60 text-xs mt-0.5">{item.desc}</div>
+                    </div>
                   </div>
                 ))}
               </div>
-              <Link href="/chapters/robotics-automation" className="btn btn-white">
-                Explore RAS <ArrowRight className="w-4 h-4" />
+              <Link href="/join" className="btn btn-accent">
+                Participate in Next Flagship
+                <ArrowRight className="w-4 h-4" />
               </Link>
+            </div>
+
+            <div className="relative">
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] border border-white/10">
+                <Image
+                  src="/robotics.jpg"
+                  alt="Student working on robotics circuitry"
+                  fill
+                  className="object-cover"
+                />
+              </div>
+              <div className="absolute -top-4 -left-4 w-24 h-24 rounded-2xl bg-[var(--color-accent)]/15 border-2 border-[var(--color-accent)]/30 -z-10" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── NEWS ── */}
+      {/* ── LATEST NEWS ── */}
       <section className="section" aria-labelledby="news-heading">
         <div className="container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
             <div>
-              <div className="section-label">News</div>
-              <h2 id="news-heading" className="section-title mb-2">Latest from IEEE WUSL</h2>
-              <p className="section-desc">Announcements, recaps, and updates.</p>
+              <div className="section-label">Branch News</div>
+              <h2 id="news-heading" className="section-title mb-0">Latest updates & achievements</h2>
             </div>
-            <Link href="/news" className="btn btn-outline shrink-0">
-              All News <ArrowRight className="w-4 h-4" />
+            <Link href="/news" className="btn btn-outline self-start md:self-auto">
+              All News
+              <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
 
-          {news.length > 0 ? (
-            <div className="grid md:grid-cols-3 gap-6">
-              {news.map((article, i) => (
-                <Link
-                  key={article.id}
-                  href={`/news/${article.slug}`}
-                  className={`card group flex flex-col ${i === 0 ? 'md:col-span-1' : ''}`}
-                >
-                  <div className="relative aspect-[16/9] overflow-hidden">
-                    {article.cover_url ? (
-                      <Image src={article.cover_url} alt={article.title ?? ''} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[var(--color-navy-800)] to-[var(--color-navy)] flex items-center justify-center">
-                        <Radio className="w-10 h-10 text-white/25" />
-                      </div>
-                    )}
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {news.map((article) => (
+              <article key={article.id} className="card group flex flex-col">
+                {article.cover_url && (
+                  <div className="relative h-48 overflow-hidden bg-[var(--color-surface)]">
+                    <Image
+                      src={article.cover_url}
+                      alt={article.title ?? 'Article cover'}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <div className="p-5 flex flex-col flex-1">
-                    <h3 className="font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+                )}
+                <div className="p-6 flex-1 flex flex-col">
+                  {article.tags && article.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      {article.tags.slice(0, 2).map((tag: string) => (
+                        <span key={tag} className="badge badge-primary">{tag}</span>
+                      ))}
+                    </div>
+                  )}
+
+                  <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
+                    <Link href={`/news/${article.slug}`}>
                       {article.title}
-                    </h3>
-                    {article.summary && (
-                      <p className="text-sm text-[var(--color-muted)] line-clamp-3 flex-1">
-                        {article.summary}
-                      </p>
-                    )}
-                    {article.published_at && (
-                      <div className="flex items-center gap-2 mt-4 text-xs text-[var(--color-muted-light)]">
-                        <Calendar className="w-3.5 h-3.5" />
-                        {formatDate(article.published_at)}
-                      </div>
-                    )}
+                    </Link>
+                  </h3>
+
+                  <p className="text-sm text-[var(--color-muted)] leading-relaxed mb-4 flex-1 line-clamp-3">
+                    {article.summary}
+                  </p>
+
+                  <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between text-xs text-[var(--color-muted)]">
+                    <span>{article.published_at ? formatDate(article.published_at) : ''}</span>
+                    <Link
+                      href={`/news/${article.slug}`}
+                      className="font-semibold text-[var(--color-primary)] hover:underline inline-flex items-center gap-1"
+                    >
+                      Read story <ChevronRight className="w-3 h-3" />
+                    </Link>
                   </div>
-                </Link>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-16 rounded-2xl border-2 border-dashed border-[var(--color-border)] bg-[var(--color-surface)]">
-              <Radio className="w-10 h-10 text-[var(--color-muted-light)] mx-auto mb-3" />
-              <h3 className="font-semibold text-[var(--color-text)] mb-1">News coming soon</h3>
-              <p className="text-sm text-[var(--color-muted)]">Stay tuned for announcements and updates.</p>
-            </div>
-          )}
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       {/* ── EXECUTIVE COMMITTEE ── */}
       <section className="section section-surface" aria-labelledby="team-heading">
         <div className="container">
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-12">
-            <div>
-              <div className="section-label">Leadership</div>
-              <h2 id="team-heading" className="section-title mb-2">Executive Committee</h2>
-              <p className="section-desc">Meet the student leaders driving IEEE WUSL forward.</p>
-            </div>
-            <Link href="/team" className="btn btn-outline shrink-0">
-              Meet All Members <ArrowRight className="w-4 h-4" />
-            </Link>
+          <div className="section-header-center">
+            <div className="section-label justify-center">Leadership</div>
+            <h2 id="team-heading" className="section-title">
+              Executive Committee
+            </h2>
+            <p className="section-desc section-desc-center">
+              Dedicated student leaders driving the vision, operations, and community of IEEE WUSL.
+            </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((member) => (
-              <div key={member.id} className="card p-6 flex flex-col items-center text-center group">
-                <div className="relative w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-[var(--color-border)] group-hover:ring-[var(--color-primary)] transition-all">
+              <div key={member.id} className="card p-6 flex flex-col items-center text-center">
+                <div className="relative w-24 h-24 rounded-full overflow-hidden mb-4 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xl font-bold shadow-md">
                   {member.photo_url ? (
-                    <Image src={member.photo_url} alt={member.full_name} fill className="object-cover" />
+                    <Image
+                      src={member.photo_url}
+                      alt={member.full_name}
+                      fill
+                      className="object-cover"
+                    />
                   ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-navy)] flex items-center justify-center">
-                      <span className="text-xl font-bold text-white">{getInitials(member.full_name)}</span>
-                    </div>
+                    <span>{getInitials(member.full_name)}</span>
                   )}
                 </div>
+
                 <h3 className="font-bold text-[var(--color-text)] text-base mb-1">{member.full_name}</h3>
-                <p className="text-xs font-semibold text-[var(--color-primary)] tracking-wide uppercase mb-3">{member.role_title}</p>
+                <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider mb-2">
+                  {member.role_title}
+                </p>
+
                 {member.bio && (
-                  <p className="text-xs text-[var(--color-muted)] line-clamp-3 leading-relaxed mb-4 flex-1">{member.bio}</p>
+                  <p className="text-xs text-[var(--color-muted)] leading-relaxed mb-4 line-clamp-2">
+                    {member.bio}
+                  </p>
                 )}
-                <div className="flex items-center gap-2 mt-auto pt-3 border-t border-[var(--color-border)] w-full justify-center">
-                  {member.email && (
-                    <a
-                      href={`mailto:${member.email}`}
-                      className="p-1.5 rounded-lg hover:bg-[var(--color-surface-2)] text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors"
-                      aria-label={`Email ${member.full_name}`}
-                    >
-                      <Mail className="w-4 h-4" />
-                    </a>
-                  )}
+
+                <div className="flex items-center gap-2 mt-auto">
                   {member.linkedin_url && (
                     <a
                       href={member.linkedin_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-[var(--color-surface-2)] text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors"
-                      aria-label={`${member.full_name} on LinkedIn`}
+                      className="w-7 h-7 rounded-lg bg-[var(--color-surface-2)] text-[var(--color-muted)] hover:text-[var(--color-primary)] flex items-center justify-center transition-colors"
+                      aria-label={`${member.full_name}'s LinkedIn`}
                     >
-                      <LinkedinIcon size={16} />
+                      <LinkedinIcon className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                  {member.email && (
+                    <a
+                      href={`mailto:${member.email}`}
+                      className="w-7 h-7 rounded-lg bg-[var(--color-surface-2)] text-[var(--color-muted)] hover:text-[var(--color-primary)] flex items-center justify-center transition-colors"
+                      aria-label={`Email ${member.full_name}`}
+                    >
+                      <Mail className="w-3.5 h-3.5" />
                     </a>
                   )}
                 </div>
               </div>
             ))}
           </div>
+
+          <div className="text-center mt-10">
+            <Link href="/team" className="btn btn-outline">
+              Meet the Full Committee
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
       </section>
 
-      {/* ── JOIN CTA ── */}
-      <section className="section bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-navy-700)]" aria-label="Join call to action">
-        <div className="container text-center">
-          <div className="max-w-2xl mx-auto">
-            <div className="inline-flex items-center gap-2 mb-6 px-3.5 py-1.5 rounded-full bg-white/15 border border-white/20">
-              <Users className="w-3.5 h-3.5 text-white" />
-              <span className="text-xs font-semibold text-white tracking-wider uppercase">
-                Open Membership
-              </span>
-            </div>
-            <h2 className="text-white mb-5 text-4xl md:text-5xl font-bold">
-              Your engineering journey starts here.
-            </h2>
-            <p className="text-white/70 text-lg mb-10 leading-relaxed">
-              Join a global network of innovators, gain hands-on technical experience, and become part of a community that&apos;s shaping the future of engineering in Sri Lanka.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 justify-center">
-              <Link href="/join" className="btn btn-white btn-lg">
-                Join IEEE WUSL <ArrowRight className="w-5 h-5" />
-              </Link>
-              <Link href="/about" className="btn btn-white-outline btn-lg">
-                Learn More
-              </Link>
-            </div>
+      {/* ── CTA / JOIN ── */}
+      <section className="section bg-[var(--color-navy)] text-white relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage: `radial-gradient(circle at 20% 50%, rgba(22,135,217,0.5) 0%, transparent 60%)`,
+          }}
+        />
+        <div className="container relative text-center max-w-2xl mx-auto">
+          <div className="w-12 h-12 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <Zap className="w-6 h-6 text-white" fill="currentColor" />
+          </div>
+          <h2 className="text-white text-3xl md:text-4xl font-bold mb-4">
+            Become an IEEE Member Today
+          </h2>
+          <p className="text-white/65 text-lg leading-relaxed mb-8">
+            Access global resources, participate in international competitions, receive research publications, and build friendships that will define your engineering career.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/join" className="btn btn-accent btn-lg">
+              Join IEEE WUSL
+              <ArrowRight className="w-5 h-5" />
+            </Link>
+            <Link href="/about" className="btn btn-white-outline btn-lg">
+              Learn More About Us
+            </Link>
           </div>
         </div>
       </section>

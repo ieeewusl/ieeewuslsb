@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { PublicationStatus, Chapter, Project } from '@/types/database'
+import ImageUpload from './ImageUpload'
 
 interface ProjectFormProps {
   initialData?: Partial<Project> & { id?: string }
@@ -54,15 +55,12 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
     setError(null)
 
     if (!form.title.trim() || !form.slug.trim()) {
-      setError('Title and slug are required.')
+      setError('Project title and slug are required.')
       return
     }
 
     startTransition(async () => {
       const supabase = createClient()
-      const members = form.members.split(',').map(m => m.trim()).filter(Boolean)
-      const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean)
-
       const payload = {
         title: form.title,
         slug: form.slug,
@@ -72,8 +70,8 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
         github_url: form.github_url || null,
         demo_url: form.demo_url || null,
         chapter_id: form.chapter_id || null,
-        members,
-        tags,
+        members: form.members ? form.members.split(',').map(s => s.trim()).filter(Boolean) : [],
+        tags: form.tags ? form.tags.split(',').map(s => s.trim()).filter(Boolean) : [],
         start_date: form.start_date || null,
         end_date: form.end_date || null,
         featured: form.featured,
@@ -118,7 +116,7 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
       )}
 
       <div className="card p-6 space-y-5">
-        <h2 className="text-base font-bold text-[var(--color-text)]">Project Information</h2>
+        <h2 className="text-base font-bold text-[var(--color-text)]">Project Overview</h2>
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
@@ -126,7 +124,7 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
             <input
               type="text"
               required
-              placeholder="e.g. Smart Campus IoT Monitoring System"
+              placeholder="e.g. Autonomous Maze Solving Robot"
               value={form.title}
               onChange={handleTitleChange}
               className="input"
@@ -138,7 +136,7 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
             <input
               type="text"
               required
-              placeholder="smart-campus-iot"
+              placeholder="autonomous-maze-solving-robot"
               value={form.slug}
               onChange={e => set('slug', slugify(e.target.value))}
               className="input font-mono text-sm"
@@ -150,7 +148,7 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
           <label className="label">Short Summary</label>
           <input
             type="text"
-            placeholder="A concise overview of the project and its goals"
+            placeholder="A one-line punchy description of the project"
             value={form.summary}
             onChange={e => set('summary', e.target.value)}
             className="input"
@@ -158,10 +156,10 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
         </div>
 
         <div>
-          <label className="label">Full Project Description</label>
+          <label className="label">Full Details & Documentation</label>
           <textarea
-            rows={6}
-            placeholder="Detailed description, methodology, achievements, and findings..."
+            rows={5}
+            placeholder="Technical details, methodology, achievements, outcomes..."
             value={form.description}
             onChange={e => set('description', e.target.value)}
             className="input"
@@ -170,7 +168,7 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
 
         <div className="grid md:grid-cols-2 gap-4">
           <div>
-            <label className="label">Associated Chapter</label>
+            <label className="label">Technical Chapter / Affinity</label>
             <select
               value={form.chapter_id}
               onChange={e => set('chapter_id', e.target.value)}
@@ -184,15 +182,26 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
           </div>
 
           <div>
-            <label className="label">Cover Image URL</label>
+            <label className="label">Team Members (comma-separated)</label>
             <input
-              type="url"
-              placeholder="https://..."
-              value={form.cover_url}
-              onChange={e => set('cover_url', e.target.value)}
+              type="text"
+              placeholder="Kamal Perera, Nimal Silva"
+              value={form.members}
+              onChange={e => set('members', e.target.value)}
               className="input"
             />
           </div>
+        </div>
+
+        <div>
+          <ImageUpload
+            label="Cover Image"
+            value={form.cover_url}
+            onChange={url => set('cover_url', url)}
+            folder="projects"
+            description="Upload project banner or showcase photo (PNG, JPG, WEBP)"
+            aspectRatio="wide"
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-4">
@@ -219,36 +228,22 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-3 gap-4">
           <div>
-            <label className="label">Team Contributors (comma-separated)</label>
+            <label className="label">Tags (comma-separated)</label>
             <input
               type="text"
-              placeholder="Kasun Perera, Dinithi Silva, ..."
-              value={form.members}
-              onChange={e => set('members', e.target.value)}
-              className="input"
-            />
-          </div>
-
-          <div>
-            <label className="label">Tech Stack & Tags (comma-separated)</label>
-            <input
-              type="text"
-              placeholder="IoT, ESP32, Python, React, Cloud"
+              placeholder="Robotics, Arduino, C++"
               value={form.tags}
               onChange={e => set('tags', e.target.value)}
               className="input"
             />
           </div>
-        </div>
 
-        <div className="grid md:grid-cols-2 gap-4">
           <div>
             <label className="label">Start Date</label>
             <input
-              type="text"
-              placeholder="e.g. Jan 2024"
+              type="date"
               value={form.start_date}
               onChange={e => set('start_date', e.target.value)}
               className="input"
@@ -256,10 +251,9 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
           </div>
 
           <div>
-            <label className="label">Completion Date</label>
+            <label className="label">End Date (optional)</label>
             <input
-              type="text"
-              placeholder="e.g. Dec 2024 (or leave blank if ongoing)"
+              type="date"
               value={form.end_date}
               onChange={e => set('end_date', e.target.value)}
               className="input"
@@ -268,8 +262,21 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
         </div>
 
         <div className="grid md:grid-cols-2 gap-4 pt-3 border-t border-[var(--color-border)]">
+          <div className="flex items-center gap-3 pt-6">
+            <input
+              id="featured"
+              type="checkbox"
+              checked={form.featured}
+              onChange={e => set('featured', e.target.checked)}
+              className="w-4 h-4 rounded text-[var(--color-primary)]"
+            />
+            <label htmlFor="featured" className="text-sm font-medium text-[var(--color-text)] cursor-pointer">
+              Feature on Homepage & Projects showcase
+            </label>
+          </div>
+
           <div>
-            <label className="label">Publication Status</label>
+            <label className="label">Status</label>
             <select
               value={form.status}
               onChange={e => set('status', e.target.value as PublicationStatus)}
@@ -279,19 +286,6 @@ export default function ProjectForm({ initialData, chapters, mode }: ProjectForm
               <option value="draft">Draft</option>
               <option value="archived">Archived</option>
             </select>
-          </div>
-
-          <div className="flex items-center gap-2 pt-6">
-            <input
-              type="checkbox"
-              id="featured"
-              checked={form.featured}
-              onChange={e => set('featured', e.target.checked)}
-              className="rounded border-[var(--color-border)] text-[var(--color-primary)] focus:ring-[var(--color-primary)] h-4 w-4"
-            />
-            <label htmlFor="featured" className="text-sm font-medium text-[var(--color-text)]">
-              Feature on Homepage & Projects showcase
-            </label>
           </div>
         </div>
       </div>

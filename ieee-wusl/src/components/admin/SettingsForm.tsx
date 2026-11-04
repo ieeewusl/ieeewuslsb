@@ -4,6 +4,7 @@ import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
+import ImageUpload from './ImageUpload'
 
 interface SettingsFormProps {
   initialSettings: Record<string, unknown>
@@ -16,6 +17,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
   const [success, setSuccess] = useState(false)
 
   const [settings, setSettings] = useState({
+    site_logo_url: (initialSettings.site_logo_url as string) || '/wusl-sb-logo.png',
     university_name: (initialSettings.university_name as string) || 'Wayamba University of Sri Lanka',
     tagline: (initialSettings.tagline as string) || 'Empowering Future Engineers & Technologists',
     contact_email: (initialSettings.contact_email as string) || 'ieee.wusl@gmail.com',
@@ -86,6 +88,25 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
           <span>Settings saved successfully!</span>
         </div>
       )}
+
+      {/* IEEE WUSL Student Branch Logo */}
+      <div className="card p-6 space-y-4">
+        <div>
+          <h2 className="text-base font-bold text-[var(--color-text)]">IEEE WUSL Student Branch Logo</h2>
+          <p className="text-xs text-[var(--color-muted)] mt-0.5">
+            Upload the official Student Branch logo to display across the site navigation, footer, and admin dashboard.
+          </p>
+        </div>
+
+        <ImageUpload
+          label="Student Branch Logo"
+          value={settings.site_logo_url}
+          onChange={url => set('site_logo_url', url || '/wusl-sb-logo.png')}
+          folder="logos"
+          description="Upload WUSL SB LOGO (PNG with transparent background recommended, Max 10MB)"
+          aspectRatio="wide"
+        />
+      </div>
 
       {/* General Information */}
       <div className="card p-6 space-y-5">

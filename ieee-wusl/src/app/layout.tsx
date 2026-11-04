@@ -11,6 +11,10 @@ export const metadata: Metadata = {
     'The IEEE Student Branch at Wayamba University of Sri Lanka — connecting engineers, driving innovation, and building the future of technology.',
   keywords: ['IEEE', 'student branch', 'Wayamba University', 'engineering', 'Sri Lanka', 'WUSL'],
   authors: [{ name: 'IEEE Student Branch WUSL' }],
+  icons: {
+    icon: '/icon.png',
+    apple: '/icon.png',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_US',
@@ -19,11 +23,13 @@ export const metadata: Metadata = {
     title: 'IEEE Student Branch — Wayamba University of Sri Lanka',
     description:
       'The IEEE Student Branch at Wayamba University of Sri Lanka — connecting engineers, driving innovation, and building the future of technology.',
+    images: [{ url: '/wusl-sb-logo.png', width: 1353, height: 180, alt: 'IEEE WUSL Student Branch Logo' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'IEEE Student Branch WUSL',
     description: 'Connecting engineers, driving innovation.',
+    images: ['/wusl-sb-logo.png'],
   },
   robots: { index: true, follow: true },
 }
@@ -34,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" className="scroll-smooth">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
