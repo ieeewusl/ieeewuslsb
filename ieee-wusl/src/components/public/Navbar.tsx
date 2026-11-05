@@ -78,7 +78,7 @@ export default function Navbar() {
               aria-label="IEEE WUSL Student Branch Home"
             >
               <Image
-                src={scrolled ? '/wusl-sb-logo.png' : '/wusl-sb-logo-white.png'}
+                src={scrolled ? '/wusl-sb-logo.png' : '/White WUSL SB LOGOv02.png'}
                 alt="IEEE Student Branch Wayamba University of Sri Lanka"
                 width={260}
                 height={40}

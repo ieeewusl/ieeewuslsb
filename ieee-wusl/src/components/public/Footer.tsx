@@ -59,7 +59,7 @@ export default function Footer() {
           <div className="lg:col-span-2">
             <Link href="/" className="inline-block mb-5" aria-label="IEEE WUSL Home">
               <Image
-                src="/wusl-sb-logo-white.png"
+                src="/White WUSL SB LOGOv02.png"
                 alt="IEEE Student Branch Wayamba University of Sri Lanka"
                 width={280}
                 height={44}

@@ -16,6 +16,13 @@ export default function BackToTop() {
   }, [])
 
   function scrollToTop() {
+    if (typeof window !== 'undefined') {
+      const lenisInstance = (window as unknown as { __lenis?: { scrollTo: (target: number | string | HTMLElement, opts?: { duration?: number }) => void } }).__lenis
+      if (lenisInstance) {
+        lenisInstance.scrollTo(0, { duration: 1.4 })
+        return
+      }
+    }
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
@@ -28,7 +35,7 @@ export default function BackToTop() {
       onClick={scrollToTop}
       aria-label="Back to top"
       className={cn(
-        'fixed bottom-6 right-6 z-40 p-3 rounded-full bg-[var(--color-primary)] text-white shadow-lg hover:bg-[var(--color-primary-light)] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-bright)] focus:ring-offset-2 transition-all duration-300 transform',
+        'fixed bottom-6 right-6 z-40 p-3 rounded-full bg-[var(--color-primary)] text-white shadow-lg hover:bg-[var(--color-primary-light)] hover:shadow-xl focus:outline-none focus:ring-2 focus:ring-[var(--color-bright)] focus:ring-offset-2 transition-all duration-300 transform cursor-pointer',
         visible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-4 scale-90 pointer-events-none'
       )}
     >
@@ -36,4 +43,3 @@ export default function BackToTop() {
     </button>
   )
 }
-

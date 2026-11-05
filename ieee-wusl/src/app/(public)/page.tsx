@@ -608,8 +608,14 @@ export default async function HomePage() {
           }}
         />
         <div className="container relative text-center max-w-2xl mx-auto">
-          <div className="w-12 h-12 rounded-2xl bg-[var(--color-primary)] flex items-center justify-center mx-auto mb-6 shadow-lg">
-            <Zap className="w-6 h-6 text-white" fill="currentColor" />
+          <div className="inline-flex items-center justify-center p-3.5 bg-white rounded-2xl shadow-xl mb-6 mx-auto border border-white/20">
+            <Image
+              src="/ieee.jpg"
+              alt="IEEE - Advancing Technology for Humanity"
+              width={220}
+              height={65}
+              className="h-11 sm:h-12 w-auto object-contain"
+            />
           </div>
           <h2 className="text-white text-3xl md:text-4xl font-bold mb-4">
             Become an IEEE Member Today
