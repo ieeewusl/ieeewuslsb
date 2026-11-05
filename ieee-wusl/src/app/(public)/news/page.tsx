@@ -61,14 +61,13 @@ export default async function NewsPage() {
               {/* Featured */}
               {featured && (
                 <Link href={`/news/${featured.slug}`} className="card group flex flex-col md:flex-row gap-0 mb-10 overflow-hidden">
-                  <div className="relative aspect-video md:aspect-auto md:w-1/2 shrink-0">
-                    {featured.cover_url ? (
-                      <Image src={featured.cover_url} alt={featured.title ?? ''} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)] min-h-64 flex items-center justify-center">
-                        <Radio className="w-16 h-16 text-white/20" />
-                      </div>
-                    )}
+                  <div className="relative aspect-video md:aspect-auto md:w-1/2 shrink-0 bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
+                    <Image
+                      src={featured.cover_url || 'https://images.unsplash.com/photo-1511578314322-379afb476865?auto=format&fit=crop&w=1200&q=80'}
+                      alt={featured.title ?? ''}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
                   </div>
                   <div className="p-8 flex flex-col justify-center">
                     {featured.tags && featured.tags.length > 0 && (
@@ -101,15 +100,14 @@ export default async function NewsPage() {
               {rest.length > 0 && (
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                   {rest.map(article => (
-                    <Link key={article.id} href={`/news/${article.slug}`} className="card group flex flex-col">
-                      <div className="relative aspect-[16/9] overflow-hidden">
-                        {article.cover_url ? (
-                          <Image src={article.cover_url} alt={article.title ?? ''} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-                        ) : (
-                          <div className="w-full h-full bg-gradient-to-br from-[var(--color-navy-800)] to-[var(--color-navy)] flex items-center justify-center">
-                            <Radio className="w-10 h-10 text-white/20" />
-                          </div>
-                        )}
+                    <Link key={article.id} href={`/news/${article.slug}`} className="card group flex flex-col overflow-hidden">
+                      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-[var(--color-navy-800)] to-[var(--color-navy)]">
+                        <Image
+                          src={article.cover_url || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80'}
+                          alt={article.title ?? ''}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
                       </div>
                       <div className="p-5 flex flex-col flex-1">
                         {article.tags && article.tags.length > 0 && (

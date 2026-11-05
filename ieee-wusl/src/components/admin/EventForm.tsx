@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { PublicationStatus, EventCategory, Chapter, Event } from '@/types/database'
+import ImageUpload from './ImageUpload'
 
 interface EventFormData {
   title: string
@@ -18,6 +19,7 @@ interface EventFormData {
   venue: string
   is_online: boolean
   meeting_url: string
+  cover_url: string
   registration_url: string
   organizer: string
   chapter_id: string
@@ -48,6 +50,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
     venue: initialData?.venue ?? '',
     is_online: initialData?.is_online ?? false,
     meeting_url: initialData?.meeting_url ?? '',
+    cover_url: initialData?.cover_url ?? '',
     registration_url: initialData?.registration_url ?? '',
     organizer: initialData?.organizer ?? '',
     chapter_id: initialData?.chapter_id ?? '',
@@ -80,6 +83,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
         end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
         chapter_id: form.chapter_id || null,
         meeting_url: form.meeting_url || null,
+        cover_url: form.cover_url || null,
         registration_url: form.registration_url || null,
         venue: form.venue || null,
         organizer: form.organizer || null,
@@ -117,7 +121,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
       )}
       {success && (
         <div className="flex items-center gap-2.5 p-4 rounded-xl bg-green-50 border border-green-100 text-green-700">
-          <CheckCircle2 className="w-4.5 h-4.5 shrink-0" />
+          <CheckCircle2 className="w-4.5 h-4.5" />
           <span className="text-sm">Event saved successfully!</span>
         </div>
       )}
@@ -130,23 +134,36 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
 
             <div>
               <label className="label" htmlFor="title">Title <span className="text-red-500">*</span></label>
-              <input id="title" type="text" required value={form.title} onChange={handleTitleChange} className="input" placeholder="IEEE Workshop on Machine Learning" />
+              <input id="title" type="text" required value={form.title} onChange={handleTitleChange} className="input" placeholder="WayaExtreme Hackathon 2026" />
             </div>
 
             <div>
               <label className="label" htmlFor="slug">URL Slug <span className="text-red-500">*</span></label>
-              <input id="slug" type="text" required value={form.slug} onChange={e => set('slug', e.target.value)} className="input font-mono text-sm" placeholder="ieee-workshop-machine-learning" />
+              <input id="slug" type="text" required value={form.slug} onChange={e => set('slug', e.target.value)} className="input font-mono text-sm" placeholder="wayaextreme-hackathon-2026" />
             </div>
 
             <div>
               <label className="label" htmlFor="summary">Summary</label>
-              <textarea id="summary" value={form.summary} onChange={e => set('summary', e.target.value)} rows={2} className="input resize-none" placeholder="Brief description of the event…" />
+              <textarea id="summary" value={form.summary} onChange={e => set('summary', e.target.value)} rows={2} className="input resize-none" placeholder="Brief punchy description of the event…" />
             </div>
 
             <div>
               <label className="label" htmlFor="description">Full Description</label>
-              <textarea id="description" value={form.description} onChange={e => set('description', e.target.value)} rows={6} className="input resize-y" placeholder="Detailed event description…" />
+              <textarea id="description" value={form.description} onChange={e => set('description', e.target.value)} rows={6} className="input resize-y" placeholder="Detailed event schedule, rules, guidelines, eligibility…" />
             </div>
+          </div>
+
+          {/* Event Cover Image */}
+          <div className="card p-6 space-y-4">
+            <h2 className="font-semibold text-[var(--color-text)]">Event Poster & Banner</h2>
+            <ImageUpload
+              label="Cover Image / Promotional Poster"
+              value={form.cover_url}
+              onChange={url => set('cover_url', url)}
+              folder="events"
+              description="Upload event banner or poster image (PNG, JPG, WEBP - Max 10MB)"
+              aspectRatio="wide"
+            />
           </div>
 
           <div className="card p-6 space-y-4">
@@ -165,7 +182,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
 
             <div>
               <label className="label" htmlFor="venue">Venue</label>
-              <input id="venue" type="text" value={form.venue} onChange={e => set('venue', e.target.value)} className="input" placeholder="Main Auditorium, Wayamba University" />
+              <input id="venue" type="text" value={form.venue} onChange={e => set('venue', e.target.value)} className="input" placeholder="Main Auditorium / Faculty Complex, Wayamba University" />
             </div>
 
             <div className="flex items-center gap-3">
@@ -191,7 +208,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
         {/* Sidebar */}
         <div className="space-y-5">
           <div className="card p-5 space-y-4">
-            <h2 className="font-semibold text-[var(--color-text)]">Publish</h2>
+            <h2 className="font-semibold text-[var(--color-text)]">Publish & Spotlight</h2>
 
             <div>
               <label className="label" htmlFor="status">Status</label>
@@ -202,9 +219,23 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
               </select>
             </div>
 
-            <div className="flex items-center gap-3">
-              <input id="featured" type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} className="w-4 h-4 rounded accent-[var(--color-primary)]" />
-              <label htmlFor="featured" className="text-sm font-medium text-[var(--color-text)]">Feature on homepage</label>
+            {/* Hot Event Spotlight Toggle */}
+            <div className="p-3.5 bg-gradient-to-br from-amber-50 to-orange-50 border border-amber-200/80 rounded-xl space-y-1.5">
+              <div className="flex items-center gap-2.5">
+                <input
+                  id="featured"
+                  type="checkbox"
+                  checked={form.featured}
+                  onChange={e => set('featured', e.target.checked)}
+                  className="w-4 h-4 rounded text-amber-600 focus:ring-amber-500 cursor-pointer"
+                />
+                <label htmlFor="featured" className="text-sm font-bold text-amber-950 cursor-pointer flex items-center gap-1.5">
+                  Spotlight as Hot Event 🔥
+                </label>
+              </div>
+              <p className="text-[11px] text-amber-800 leading-relaxed">
+                Highlights this event in the mega featured section on the homepage with an active live countdown timer and prominent registration button!
+              </p>
             </div>
 
             <div className="flex gap-2 pt-2">
@@ -221,10 +252,10 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
             <div>
               <label className="label" htmlFor="category">Category</label>
               <select id="category" value={form.category} onChange={e => set('category', e.target.value as EventCategory)} className="input">
+                <option value="hackathon">Hackathon</option>
+                <option value="competition">Competition</option>
                 <option value="workshop">Workshop</option>
                 <option value="seminar">Seminar</option>
-                <option value="competition">Competition</option>
-                <option value="hackathon">Hackathon</option>
                 <option value="webinar">Webinar</option>
                 <option value="conference">Conference</option>
                 <option value="social">Social</option>
@@ -240,7 +271,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
             <div>
               <label className="label" htmlFor="chapter_id">Chapter</label>
               <select id="chapter_id" value={form.chapter_id} onChange={e => set('chapter_id', e.target.value)} className="input">
-                <option value="">— None —</option>
+                <option value="">— None / IEEE General —</option>
                 {chapters.map(c => (
                   <option key={c.id} value={c.id}>{c.name}</option>
                 ))}

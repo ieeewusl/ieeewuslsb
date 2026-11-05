@@ -20,9 +20,10 @@ import {
 } from 'lucide-react'
 import { LinkedinIcon } from '@/components/ui/SocialIcons'
 import { createClient } from '@/lib/supabase/server'
-import { formatDate, formatDateTime, isEventPast, getInitials } from '@/lib/utils'
+import { formatDate, formatDateTime, isEventPast, getInitials, categoryLabel } from '@/lib/utils'
 import type { Event, Chapter, NewsArticle, TeamMember } from '@/types/database'
 import { mockEvents, mockChapters, mockNews, mockTeamMembers } from '@/lib/mock-data'
+import EventCountdown from '@/components/public/EventCountdown'
 
 export const metadata: Metadata = {
   title: 'IEEE Student Branch — Wayamba University of Sri Lanka',
@@ -36,7 +37,7 @@ async function getHomeData() {
   try {
     const supabase = await createClient()
 
-    const [eventsRes, chaptersRes, newsRes, teamRes] = await Promise.all([
+    const [eventsRes, chaptersRes, newsRes, teamRes, hotEventRes] = await Promise.all([
       supabase
         .from('events')
         .select('*')
@@ -60,20 +61,30 @@ async function getHomeData() {
         .eq('status', 'published')
         .order('display_order', { ascending: true })
         .limit(4),
+      supabase
+        .from('events')
+        .select('*')
+        .eq('status', 'published')
+        .eq('featured', true)
+        .order('start_at', { ascending: true })
+        .limit(1)
+        .maybeSingle(),
     ])
 
     const events = (eventsRes.data && eventsRes.data.length > 0) ? (eventsRes.data as Event[]) : mockEvents.slice(0, 3)
     const chapters = (chaptersRes.data && chaptersRes.data.length > 0) ? (chaptersRes.data as Chapter[]) : mockChapters
     const news = (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as Partial<NewsArticle>[]) : mockNews.slice(0, 3)
     const team = (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 4)
+    const hotEvent = (hotEventRes?.data as Event | null) ?? (mockEvents.find(e => e.featured) as Event) ?? mockEvents[0]
 
-    return { events, chapters, news, team }
+    return { events, chapters, news, team, hotEvent }
   } catch {
     return {
       events: mockEvents.slice(0, 3),
       chapters: mockChapters,
       news: mockNews.slice(0, 3),
       team: mockTeamMembers.slice(0, 4),
+      hotEvent: (mockEvents.find(e => e.featured) as Event) ?? mockEvents[0],
     }
   }
 }
@@ -93,7 +104,7 @@ const chapterColors: Record<string, string> = {
 }
 
 export default async function HomePage() {
-  const { events, chapters, news, team } = await getHomeData()
+  const { events, chapters, news, team, hotEvent } = await getHomeData()
 
   return (
     <>
@@ -147,13 +158,13 @@ export default async function HomePage() {
                 Engineers, Innovators, and Leaders
               </span>
               <br />
-              Through 
+              Through
               <span className="text-[var(--color-accent)]"> IEEE.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/70 max-w-xl leading-relaxed mb-10">
               We are a community of students passionate about technology, research, and impact. From workshops to industry talks and community projects,
-        our branch empowers members to learn, create, and lead.
+              our branch empowers members to learn, create, and lead.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -263,58 +274,58 @@ export default async function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
             {chapters.length > 0
               ? chapters.map((chapter) => {
-                  const Icon = chapterIcons[chapter.slug] ?? Cpu
-                  const gradient = chapterColors[chapter.slug] ?? 'from-blue-600 to-blue-800'
-                  return (
-                    <Link
-                      key={chapter.id}
-                      href={`/chapters/${chapter.slug}`}
-                      className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform"
-                    >
-                      {chapter.logo_url ? (
-                        <div className="relative w-12 h-12 rounded-xl overflow-hidden mb-4 p-1.5 bg-white border border-[var(--color-border)] shadow-sm flex items-center justify-center">
-                          <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-1" />
-                        </div>
-                      ) : (
-                        <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                          <Icon className="w-6 h-6 text-white" />
-                        </div>
-                      )}
-                      <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
-                        IEEE {chapter.name}
-                      </h3>
-                      <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1">
-                        {chapter.short_desc}
-                      </p>
-                      <div className="flex items-center gap-1 mt-4 text-sm font-medium text-[var(--color-primary)]">
-                        Learn more <ChevronRight className="w-3.5 h-3.5" />
+                const Icon = chapterIcons[chapter.slug] ?? Cpu
+                const gradient = chapterColors[chapter.slug] ?? 'from-blue-600 to-blue-800'
+                return (
+                  <Link
+                    key={chapter.id}
+                    href={`/chapters/${chapter.slug}`}
+                    className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform"
+                  >
+                    {chapter.logo_url ? (
+                      <div className="relative w-12 h-12 rounded-xl overflow-hidden mb-4 p-1.5 bg-white border border-[var(--color-border)] shadow-sm flex items-center justify-center">
+                        <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-1" />
                       </div>
-                    </Link>
-                  )
-                })
-              : /* fallback cards */
-                [
-                  { slug: 'computer-society', name: 'Computer Society', desc: 'Advancing computer science and engineering.', Icon: Monitor },
-                  { slug: 'robotics-automation', name: 'Robotics & Automation', desc: 'Exploring intelligent systems and automation.', Icon: Bot },
-                  { slug: 'women-in-engineering', name: 'Women in Engineering', desc: 'Empowering women in technology.', Icon: Users },
-                  { slug: 'power-energy', name: 'Power & Energy', desc: 'Sustainable energy innovation.', Icon: Zap },
-                ].map(({ slug, name, desc, Icon }) => {
-                  const gradient = chapterColors[slug] ?? 'from-blue-600 to-blue-800'
-                  return (
-                    <Link key={slug} href={`/chapters/${slug}`} className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform">
+                    ) : (
                       <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
                         <Icon className="w-6 h-6 text-white" />
                       </div>
-                      <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
-                        IEEE {name}
-                      </h3>
-                      <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1">{desc}</p>
-                      <div className="flex items-center gap-1 mt-4 text-sm font-medium text-[var(--color-primary)]">
-                        Learn more <ChevronRight className="w-3.5 h-3.5" />
-                      </div>
-                    </Link>
-                  )
-                })}
+                    )}
+                    <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                      IEEE {chapter.name}
+                    </h3>
+                    <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1">
+                      {chapter.short_desc}
+                    </p>
+                    <div className="flex items-center gap-1 mt-4 text-sm font-medium text-[var(--color-primary)]">
+                      Learn more <ChevronRight className="w-3.5 h-3.5" />
+                    </div>
+                  </Link>
+                )
+              })
+              : /* fallback cards */
+              [
+                { slug: 'computer-society', name: 'Computer Society', desc: 'Advancing computer science and engineering.', Icon: Monitor },
+                { slug: 'robotics-automation', name: 'Robotics & Automation', desc: 'Exploring intelligent systems and automation.', Icon: Bot },
+                { slug: 'women-in-engineering', name: 'Women in Engineering', desc: 'Empowering women in technology.', Icon: Users },
+                { slug: 'power-energy', name: 'Power & Energy', desc: 'Sustainable energy innovation.', Icon: Zap },
+              ].map(({ slug, name, desc, Icon }) => {
+                const gradient = chapterColors[slug] ?? 'from-blue-600 to-blue-800'
+                return (
+                  <Link key={slug} href={`/chapters/${slug}`} className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform">
+                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
+                      <Icon className="w-6 h-6 text-white" />
+                    </div>
+                    <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                      IEEE {name}
+                    </h3>
+                    <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1">{desc}</p>
+                    <div className="flex items-center gap-1 mt-4 text-sm font-medium text-[var(--color-primary)]">
+                      Learn more <ChevronRight className="w-3.5 h-3.5" />
+                    </div>
+                  </Link>
+                )
+              })}
           </div>
 
           <div className="text-center mt-10">
@@ -344,25 +355,34 @@ export default async function HomePage() {
             {events.map((event) => {
               const isPast = isEventPast(event.end_at, event.start_at)
               return (
-                <article key={event.id} className="card group flex flex-col">
-                  {/* Card header */}
-                  <div className="p-6 flex-1 flex flex-col">
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <span className="badge badge-primary">{event.category}</span>
+                <article key={event.id} className="card group flex flex-col overflow-hidden">
+                  {/* Event Cover Image */}
+                  <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
+                    <Image
+                      src={event.cover_url || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80'}
+                      alt={event.title}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3 flex items-center gap-1.5">
+                      <span className="badge badge-primary">{categoryLabel(event.category)}</span>
                       {isPast ? (
                         <span className="badge badge-muted">Past</span>
                       ) : (
                         <span className="badge badge-success">Upcoming</span>
                       )}
                     </div>
+                  </div>
 
-                    <h3 className="text-lg font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                  {/* Card body */}
+                  <div className="p-6 flex-1 flex flex-col">
+                    <h3 className="text-lg font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors line-clamp-2">
                       <Link href={`/events/${event.slug}`}>
                         {event.title}
                       </Link>
                     </h3>
 
-                    <p className="text-sm text-[var(--color-muted)] leading-relaxed mb-4 flex-1">
+                    <p className="text-sm text-[var(--color-muted)] leading-relaxed mb-4 flex-1 line-clamp-3">
                       {event.summary}
                     </p>
 
@@ -405,63 +425,117 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── ROBOTICS & FLAGSHIP HIGHLIGHT ── */}
-      <section className="section section-dark overflow-hidden relative">
-        <div
-          className="absolute inset-0 opacity-15"
-          style={{
-            backgroundImage: `radial-gradient(circle at 80% 50%, rgba(242,140,40,0.3) 0%, transparent 60%)`,
-          }}
-        />
-        <div className="container relative">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <div className="section-label" style={{ color: 'var(--color-accent)' }}>
-                <span>Flagship Activities</span>
-              </div>
-              <h2 className="text-white text-3xl md:text-4xl font-bold mb-6">
-                Where engineering meets competition and creativity.
-              </h2>
-              <p className="text-white/70 text-lg leading-relaxed mb-6">
-                From national robotics competitions to inter-university hackathons, IEEE WUSL members regularly design, build, and deploy cutting-edge engineering solutions.
-              </p>
-              <div className="space-y-4 mb-8">
-                {[
-                  { title: 'Annual Robotics Symposium', desc: 'Autonomous robotics challenge open to all Sri Lankan university teams.' },
-                  { title: 'WUSL Hackathon Series', desc: '48-hour software and hardware sprint solving national industrial problems.' },
-                  { title: 'WIE Leadership Summit', desc: 'Empowering women engineers with leadership skills and industry networks.' },
-                ].map((item) => (
-                  <div key={item.title} className="flex items-start gap-3">
-                    <div className="w-6 h-6 rounded-full bg-[var(--color-accent)]/20 text-[var(--color-accent)] flex items-center justify-center shrink-0 mt-0.5">
-                      <Flame className="w-3.5 h-3.5" />
-                    </div>
-                    <div>
-                      <div className="font-semibold text-white text-sm">{item.title}</div>
-                      <div className="text-white/60 text-xs mt-0.5">{item.desc}</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <Link href="/join" className="btn btn-accent">
-                Participate in Next Flagship
-                <ArrowRight className="w-4 h-4" />
-              </Link>
-            </div>
+      {/* ── HOT EVENT SPOTLIGHT ── */}
+      {hotEvent && (
+        <section className="section section-dark overflow-hidden relative">
+          {/* Ambient Glows */}
+          <div
+            className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20"
+            style={{
+              background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)',
+            }}
+          />
+          <div
+            className="absolute bottom-0 left-10 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-15"
+            style={{
+              background: 'radial-gradient(circle, var(--color-primary) 0%, transparent 70%)',
+            }}
+          />
 
-            <div className="relative">
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] border border-white/10">
-                <Image
-                  src="/robotics.jpg"
-                  alt="Student working on robotics circuitry"
-                  fill
-                  className="object-cover"
-                />
+          <div className="container relative z-10">
+            <div className="grid lg:grid-cols-12 gap-10 items-center">
+              {/* Event Content & Countdown */}
+              <div className="lg:col-span-7 flex flex-col items-start">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 text-[var(--color-accent)] text-xs font-bold uppercase tracking-wider mb-5">
+                  <Flame className="w-4 h-4 animate-pulse text-[var(--color-accent)]" />
+                  <span>Spotlight Event</span>
+                  <span className="w-1 h-1 rounded-full bg-[var(--color-accent)]" />
+                  <span>{categoryLabel(hotEvent.category)}</span>
+                </div>
+
+                <h2 className="text-white text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4 leading-[1.15]">
+                  {hotEvent.title}
+                </h2>
+
+                <p className="text-white/75 text-base sm:text-lg leading-relaxed mb-6 max-w-2xl">
+                  {hotEvent.summary || hotEvent.description}
+                </p>
+
+                {/* Event meta tags */}
+                <div className="flex flex-wrap items-center gap-4 text-sm text-white/80 mb-8 pb-6 border-b border-white/10 w-full">
+                  <div className="flex items-center gap-2">
+                    <Calendar className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                    <span>{formatDateTime(hotEvent.start_at)}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <MapPin className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
+                    <span>{hotEvent.is_online ? 'Virtual / Online Stream' : (hotEvent.venue ?? 'WUSL Main Campus')}</span>
+                  </div>
+                  {hotEvent.organizer && (
+                    <div className="flex items-center gap-2 text-white/60 text-xs w-full">
+                      <Users className="w-3.5 h-3.5 text-white/40 shrink-0" />
+                      <span>Organized by {hotEvent.organizer}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Live Countdown */}
+                <div className="w-full mb-8">
+                  <EventCountdown targetDate={hotEvent.start_at} eventTitle={hotEvent.title} />
+                </div>
+
+                {/* Actions */}
+                <div className="flex flex-wrap items-center gap-4">
+                  {hotEvent.registration_url && !isEventPast(hotEvent.end_at, hotEvent.start_at) && (
+                    <a
+                      href={hotEvent.registration_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-accent text-white font-bold px-6 py-3 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all"
+                    >
+                      Register Now
+                      <ArrowRight className="w-4 h-4 ml-1" />
+                    </a>
+                  )}
+                  <Link
+                    href={`/events/${hotEvent.slug}`}
+                    className="btn btn-outline text-white border-white/30 hover:bg-white/10 hover:border-white px-6 py-3"
+                  >
+                    View Event Details
+                  </Link>
+                </div>
               </div>
-              <div className="absolute -top-4 -left-4 w-24 h-24 rounded-2xl bg-[var(--color-accent)]/15 border-2 border-[var(--color-accent)]/30 -z-10" />
+
+              {/* Event Cover Image & Badge */}
+              <div className="lg:col-span-5 relative">
+                <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] border border-white/15 group">
+                  <Image
+                    src={hotEvent.cover_url || 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80'}
+                    alt={hotEvent.title}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    priority
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-navy)]/80 via-transparent to-transparent pointer-events-none" />
+
+                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
+                    <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 font-medium">
+                      IEEE WUSL Premier
+                    </span>
+                    <span className="px-3 py-1 rounded-full bg-[var(--color-accent)] text-white font-bold uppercase tracking-wider text-[10px]">
+                      Open for All
+                    </span>
+                  </div>
+                </div>
+
+                {/* Decorative border backdrop */}
+                <div className="absolute -top-4 -right-4 w-32 h-32 rounded-3xl bg-[var(--color-accent)]/20 border-2 border-[var(--color-accent)]/40 -z-10 blur-sm" />
+                <div className="absolute -bottom-4 -left-4 w-32 h-32 rounded-3xl bg-[var(--color-primary)]/20 border-2 border-[var(--color-primary)]/40 -z-10 blur-sm" />
+              </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* ── LATEST NEWS ── */}
       <section className="section" aria-labelledby="news-heading">
@@ -479,17 +553,15 @@ export default async function HomePage() {
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {news.map((article) => (
-              <article key={article.id} className="card group flex flex-col">
-                {article.cover_url && (
-                  <div className="relative h-48 overflow-hidden bg-[var(--color-surface)]">
-                    <Image
-                      src={article.cover_url}
-                      alt={article.title ?? 'Article cover'}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                  </div>
-                )}
+              <article key={article.id} className="card group flex flex-col overflow-hidden">
+                <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
+                  <Image
+                    src={article.cover_url || 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=1200&q=80'}
+                    alt={article.title ?? 'Article cover'}
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                </div>
                 <div className="p-6 flex-1 flex flex-col">
                   {article.tags && article.tags.length > 0 && (
                     <div className="flex flex-wrap gap-1.5 mb-3">
@@ -611,7 +683,7 @@ export default async function HomePage() {
         <div className="container relative text-center max-w-2xl mx-auto">
           <div className="inline-flex items-center justify-center p-3.5 bg-white rounded-2xl shadow-xl mb-6 mx-auto border border-white/20">
             <Image
-              src="/ieee.jpg"
+              src="/ieee.png"
               alt="IEEE - Advancing Technology for Humanity"
               width={220}
               height={65}

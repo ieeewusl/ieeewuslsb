@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase/client'
 import { slugify } from '@/lib/utils'
 import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { PublicationStatus, NewsArticle } from '@/types/database'
+import ImageUpload from './ImageUpload'
 
 interface NewsFormProps {
   initialData?: Partial<NewsArticle> & { id?: string }
@@ -23,6 +24,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
     slug: initialData?.slug ?? '',
     summary: initialData?.summary ?? '',
     content: initialData?.content ?? '',
+    cover_url: initialData?.cover_url ?? '',
     author_name: initialData?.author_name ?? '',
     tags: (initialData?.tags ?? []).join(', '),
     status: (initialData?.status ?? 'draft') as PublicationStatus,
@@ -45,6 +47,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         slug: form.slug,
         summary: form.summary || null,
         content: form.content || null,
+        cover_url: form.cover_url || null,
         author_name: form.author_name || null,
         tags,
         status: form.status,
@@ -123,6 +126,19 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
               <p className="text-xs text-[var(--color-muted)] mt-1.5">HTML formatting is supported. Use &lt;p&gt;, &lt;h2&gt;, &lt;ul&gt;, &lt;strong&gt;, etc.</p>
             </div>
           </div>
+
+          {/* Article Cover Image */}
+          <div className="card p-6 space-y-4">
+            <h2 className="font-semibold text-[var(--color-text)]">Cover Photo & Banner</h2>
+            <ImageUpload
+              label="Article Featured Image"
+              value={form.cover_url}
+              onChange={url => set('cover_url', url)}
+              folder="news"
+              description="Upload featured image or banner (PNG, JPG, WEBP - Max 10MB)"
+              aspectRatio="wide"
+            />
+          </div>
         </div>
 
         <div className="space-y-5">
@@ -139,8 +155,8 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
             </div>
 
             <div className="flex items-center gap-3">
-              <input id="featured" type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} className="w-4 h-4 rounded accent-[var(--color-primary)]" />
-              <label htmlFor="featured" className="text-sm font-medium text-[var(--color-text)]">Feature on homepage</label>
+              <input id="featured" type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} className="w-4 h-4 rounded accent-[var(--color-primary)] cursor-pointer" />
+              <label htmlFor="featured" className="text-sm font-medium text-[var(--color-text)] cursor-pointer">Feature on homepage</label>
             </div>
 
             <div className="flex gap-2 pt-2">

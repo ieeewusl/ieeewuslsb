@@ -63,22 +63,29 @@ export const mockChapters: Chapter[] = [
   },
 ]
 
+const getFutureDate = (daysAhead: number, hour = 9) => {
+  const d = new Date()
+  d.setDate(d.getDate() + daysAhead)
+  d.setHours(hour, 0, 0, 0)
+  return d.toISOString()
+}
+
 export const mockEvents: Event[] = [
   {
     id: 'e1111111-1111-1111-1111-111111111111',
-    title: 'HackWayamba 2025: 24-Hour National Hackathon',
-    slug: 'hackwayamba-2025',
-    summary: 'The premier inter-university 24-hour software and hardware hackathon challenging students to solve national sustainability issues.',
-    description: 'HackWayamba 2025 brings together over 40 undergraduate engineering and computing teams from across Sri Lanka to build novel technological solutions addressing clean energy, healthcare logistics, and precision agriculture. Teams pitch directly to industry tech executives and venture founders.',
+    title: 'WayaExtreme 3.0: 24-Hour Inter-University Hackathon',
+    slug: 'wayaextreme-hackathon',
+    summary: 'The most anticipated 24-hour inter-university software and hardware hackathon challenging students to innovate and build solutions for Sri Lanka.',
+    description: 'WayaExtreme is the premier flagship hackathon hosted by the IEEE Student Branch of Wayamba University of Sri Lanka. Gathering 50+ undergraduate teams nationwide, competitors innovate, hack, and deploy novel software and IoT/hardware prototypes within a fast-paced 24-hour sprint. Winners receive cash prizes, incubation mentorship, and direct access to top tech employers.',
     category: 'hackathon',
-    start_at: '2025-05-18T09:00:00+05:30',
-    end_at: '2025-05-19T12:00:00+05:30',
-    venue: 'Faculty of Applied Sciences Auditorium, Kuliyapitiya',
+    start_at: getFutureDate(14, 9),
+    end_at: getFutureDate(15, 12),
+    venue: 'Faculty of Applied Sciences Complex, Kuliyapitiya',
     is_online: false,
     meeting_url: null,
     cover_url: 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80',
     cover_path: null,
-    registration_url: 'https://forms.gle/hackwayamba2025',
+    registration_url: 'https://forms.gle/wayaextreme2026',
     organizer: 'IEEE WUSL Student Branch & Computer Society Chapter',
     chapter_id: 'a1111111-1111-1111-1111-111111111111',
     status: 'published',
@@ -93,8 +100,8 @@ export const mockEvents: Event[] = [
     summary: 'A deep-dive technical workshop on robot simulation, LIDAR mapping, and path planning using ROS 2 Humble.',
     description: 'In this comprehensive hands-on workshop, participants configure workspace packages, simulate differential-drive mobile robots in Gazebo, implement SLAM algorithms with 2D LIDAR, and test navigation stacks.',
     category: 'workshop',
-    start_at: '2025-04-12T14:00:00+05:30',
-    end_at: '2025-04-12T18:00:00+05:30',
+    start_at: getFutureDate(22, 14),
+    end_at: getFutureDate(22, 18),
     venue: 'Hardware & Embedded Systems Lab 02',
     is_online: false,
     meeting_url: null,
@@ -104,7 +111,7 @@ export const mockEvents: Event[] = [
     organizer: 'IEEE RAS Chapter WUSL',
     chapter_id: 'a2222222-2222-2222-2222-222222222222',
     status: 'published',
-    featured: true,
+    featured: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -115,8 +122,8 @@ export const mockEvents: Event[] = [
     summary: 'An inspiring interactive symposium featuring leading female engineering leaders from global software firms.',
     description: 'Featuring keynote talks, career transition panel discussions, and an intimate Q&A session with chief technology officers and engineering managers discussing diversity and career growth in Sri Lanka and abroad.',
     category: 'seminar',
-    start_at: '2025-04-28T10:00:00+05:30',
-    end_at: '2025-04-28T13:00:00+05:30',
+    start_at: getFutureDate(35, 10),
+    end_at: getFutureDate(35, 13),
     venue: 'Virtual Stream & Main Boardroom',
     is_online: true,
     meeting_url: 'https://zoom.us/j/ieeewuslwie',
@@ -126,7 +133,7 @@ export const mockEvents: Event[] = [
     organizer: 'IEEE WIE Affinity Group WUSL',
     chapter_id: 'a3333333-3333-3333-3333-333333333333',
     status: 'published',
-    featured: true,
+    featured: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -137,8 +144,8 @@ export const mockEvents: Event[] = [
     summary: 'Technical webinar analyzing hybrid solar-storage grid tie inverter systems with senior power engineers.',
     description: 'A specialized lecture focusing on high-penetration solar PV integration into national transmission systems, active frequency control, and battery energy storage management architectures.',
     category: 'webinar',
-    start_at: '2025-03-20T18:30:00+05:30',
-    end_at: '2025-03-20T20:30:00+05:30',
+    start_at: getFutureDate(45, 18),
+    end_at: getFutureDate(45, 20),
     venue: 'Google Meet',
     is_online: true,
     meeting_url: 'https://meet.google.com/ieee-pes-wusl',

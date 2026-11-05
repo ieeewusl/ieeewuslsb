@@ -110,15 +110,14 @@ export default async function EventsPage() {
 
 function EventCard({ event, past = false }: { event: Event; past?: boolean }) {
   return (
-    <Link href={`/events/${event.slug}`} className="card group flex flex-col">
-      <div className="relative aspect-[16/9] overflow-hidden">
-        {event.cover_url ? (
-          <Image src={event.cover_url} alt={event.title} fill className="object-cover group-hover:scale-105 transition-transform duration-500" />
-        ) : (
-          <div className={`w-full h-full flex items-center justify-center ${past ? 'bg-[var(--color-surface-2)]' : 'bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-navy)]'}`}>
-            <Calendar className={`w-10 h-10 ${past ? 'text-[var(--color-muted-light)]' : 'text-white/40'}`} />
-          </div>
-        )}
+    <Link href={`/events/${event.slug}`} className="card group flex flex-col overflow-hidden">
+      <div className="relative aspect-[16/9] overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
+        <Image
+          src={event.cover_url || 'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=1200&q=80'}
+          alt={event.title}
+          fill
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
+        />
         <div className="absolute top-3 left-3 flex gap-1.5">
           <span className={`badge ${categoryColors[event.category] ?? 'badge-muted'}`}>
             {categoryLabel(event.category)}
