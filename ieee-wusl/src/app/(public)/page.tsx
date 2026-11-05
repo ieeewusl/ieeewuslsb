@@ -141,18 +141,19 @@ export default async function HomePage() {
 
             {/* Headline */}
             <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-[1.05] mb-6">
-              Engineering
+              Building Future
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-[var(--color-bright)] to-[var(--color-bright-light)]">
-                Ideas.
+                Engineers, Innovators, and Leaders
               </span>
               <br />
-              Creating
-              <span className="text-[var(--color-accent)]"> Impact.</span>
+              Through 
+              <span className="text-[var(--color-accent)]"> IEEE.</span>
             </h1>
 
             <p className="text-lg md:text-xl text-white/70 max-w-xl leading-relaxed mb-10">
-              Sri Lanka&apos;s most passionate IEEE chapter — where engineering curiosity meets real-world innovation, collaboration, and community.
+              We are a community of students passionate about technology, research, and impact. From workshops to industry talks and community projects,
+        our branch empowers members to learn, create, and lead.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
@@ -169,8 +170,8 @@ export default async function HomePage() {
             <div className="flex flex-wrap gap-x-8 gap-y-3 mt-14 pt-10 border-t border-white/15">
               {[
                 { value: '4', label: 'Technical Chapters' },
-                { value: '50+', label: 'Annual Events' },
-                { value: '500+', label: 'Active Members' },
+                { value: '10+', label: 'Annual Events' },
+                { value: '150+', label: 'Active Members' },
               ].map((stat) => (
                 <div key={stat.label}>
                   <div className="text-2xl font-bold text-white">{stat.value}</div>
