@@ -32,6 +32,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
     stat_events: (initialSettings.stat_events as number) || 45,
     stat_chapters: (initialSettings.stat_chapters as number) || 4,
     stat_projects: (initialSettings.stat_projects as number) || 18,
+    show_spotlight_section: initialSettings.show_spotlight_section !== undefined ? String(initialSettings.show_spotlight_section) === 'true' : true,
   })
 
   function set(field: string, value: unknown) {
@@ -269,6 +270,28 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
               onChange={e => set('stat_projects', parseInt(e.target.value, 10) || 0)}
               className="input"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Homepage Feature Sections */}
+      <div className="card p-6 space-y-4">
+        <h2 className="text-base font-bold text-[var(--color-text)]">Homepage Sections & Display Options</h2>
+        <div className="flex items-start gap-3 p-4 rounded-xl bg-[var(--color-surface)] border border-[var(--color-border)]">
+          <input
+            id="show_spotlight_section"
+            type="checkbox"
+            checked={settings.show_spotlight_section}
+            onChange={e => set('show_spotlight_section', e.target.checked)}
+            className="w-4 h-4 mt-0.5 rounded text-[var(--color-primary)] focus:ring-[var(--color-primary)] cursor-pointer"
+          />
+          <div>
+            <label htmlFor="show_spotlight_section" className="text-sm font-bold text-[var(--color-text)] cursor-pointer">
+              Show Hot Events Spotlight Section 🔥
+            </label>
+            <p className="text-xs text-[var(--color-muted)] mt-0.5">
+              When checked, featured spotlight events (e.g. WayaExtreme Hackathon) and their live countdown timers are prominently displayed on the homepage. Uncheck to completely hide this section from visitors.
+            </p>
           </div>
         </div>
       </div>

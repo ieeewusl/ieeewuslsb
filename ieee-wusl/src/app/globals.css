@@ -457,6 +457,32 @@
     100% { background-position: 200% 0; }
   }
 
+  /* Page loader animations */
+  @keyframes loader-progress {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(0%); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes loader-dot {
+    0%, 100% { opacity: 0.3; transform: scale(0.8); }
+    50% { opacity: 1; transform: scale(1.3); }
+  }
+
+  .animate-loader-progress {
+    animation: loader-progress 1.4s infinite ease-in-out;
+  }
+
+  .animate-loader-dot {
+    animation: loader-dot 1s infinite ease-in-out;
+  }
+
+  /* Parallax utility */
+  .parallax-bg {
+    will-change: transform;
+    transition: transform 0.1s cubic-bezier(0.25, 1, 0.5, 1);
+  }
+
   /* Animate on scroll utility */
   .fade-up {
     opacity: 0;

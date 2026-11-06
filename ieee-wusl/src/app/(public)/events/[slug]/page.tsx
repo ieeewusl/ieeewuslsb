@@ -6,6 +6,7 @@ import { Calendar, MapPin, Clock, ExternalLink, Tag, ArrowLeft, Globe } from 'lu
 import { createClient } from '@/lib/supabase/server'
 import { formatDateTime, formatDate, isEventPast, categoryLabel } from '@/lib/utils'
 import type { Event } from '@/types/database'
+import EventCountdown from '@/components/public/EventCountdown'
 
 export const revalidate = 60
 
@@ -91,6 +92,17 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
 
             {/* Sidebar */}
             <div className="space-y-5">
+              {/* Live Countdown Card */}
+              {!past && event.show_countdown !== false && (
+                <div className="card p-6 bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-navy-800)] text-white shadow-xl border border-white/10">
+                  <div className="flex items-center gap-2 text-xs font-bold text-[var(--color-accent)] uppercase tracking-wider mb-3">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span>Event Countdown</span>
+                  </div>
+                  <EventCountdown targetDate={event.start_at} eventTitle={event.title} />
+                </div>
+              )}
+
               {/* Details card */}
               <div className="card p-6">
                 <h2 className="font-bold text-[var(--color-text)] mb-5">Event Details</h2>

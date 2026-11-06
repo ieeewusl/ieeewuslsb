@@ -138,32 +138,78 @@ export default async function TeamPage() {
 
 function MemberCard({ member }: { member: TeamMember }) {
   return (
-    <div className="card p-5 flex flex-col items-center text-center group">
-      <div className="relative w-24 h-24 rounded-full overflow-hidden mb-4 ring-2 ring-[var(--color-border)] group-hover:ring-[var(--color-primary)] transition-all">
+    <div className="card group flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
+      {/* Full-size Square Photo (Badge Style) */}
+      <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
         {member.photo_url ? (
-          <Image src={member.photo_url} alt={member.full_name} fill className="object-cover" />
+          <>
+            <Image
+              src={member.photo_url}
+              alt={member.full_name}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+            <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+              <span className="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase bg-white/95 text-[var(--color-primary)] shadow-md backdrop-blur-sm">
+                {member.role_title}
+              </span>
+            </div>
+          </>
         ) : (
-          <div className="w-full h-full bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-navy)] flex items-center justify-center">
-            <span className="text-xl font-bold text-white">{getInitials(member.full_name)}</span>
+          <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-white">
+            <span className="text-4xl font-extrabold tracking-tight mb-2 opacity-90">
+              {getInitials(member.full_name)}
+            </span>
+            <span className="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase bg-white/20 text-white backdrop-blur-sm">
+              {member.role_title}
+            </span>
           </div>
         )}
       </div>
-      <h3 className="font-bold text-[var(--color-text)] text-sm mb-0.5">{member.full_name}</h3>
-      <p className="text-xs text-[var(--color-primary)] font-medium mb-2">{member.role_title}</p>
-      {member.bio && (
-        <p className="text-xs text-[var(--color-muted)] line-clamp-3 leading-relaxed mb-3">{member.bio}</p>
-      )}
-      <div className="flex items-center gap-2 mt-auto">
-        {member.email && (
-          <a href={`mailto:${member.email}`} className="p-1.5 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors" aria-label={`Email ${member.full_name}`}>
-            <Mail className="w-4 h-4" />
-          </a>
+
+      {/* Name Tag & Bio */}
+      <div className="p-5 flex flex-col flex-1 bg-[var(--color-card)]">
+        <h3 className="font-bold text-[var(--color-text)] text-base group-hover:text-[var(--color-primary)] transition-colors line-clamp-1 mb-1">
+          {member.full_name}
+        </h3>
+        <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider mb-2">
+          {member.role_title}
+        </p>
+
+        {member.bio && (
+          <p className="text-xs text-[var(--color-muted)] line-clamp-2 leading-relaxed mb-4 flex-1">
+            {member.bio}
+          </p>
         )}
-        {member.linkedin_url && (
-          <a href={member.linkedin_url} target="_blank" rel="noopener noreferrer" className="p-1.5 rounded-lg hover:bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors" aria-label={`${member.full_name} on LinkedIn`}>
-            <LinkedinIcon size={16} />
-          </a>
-        )}
+
+        <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between mt-auto">
+          <span className="text-[11px] font-medium text-[var(--color-muted)]">
+            IEEE WUSL
+          </span>
+          <div className="flex items-center gap-1.5">
+            {member.email && (
+              <a
+                href={`mailto:${member.email}`}
+                className="w-7 h-7 rounded-lg bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:bg-blue-50 flex items-center justify-center transition-colors"
+                aria-label={`Email ${member.full_name}`}
+              >
+                <Mail className="w-3.5 h-3.5" />
+              </a>
+            )}
+            {member.linkedin_url && (
+              <a
+                href={member.linkedin_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-7 h-7 rounded-lg bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:bg-blue-50 flex items-center justify-center transition-colors"
+                aria-label={`${member.full_name} on LinkedIn`}
+              >
+                <LinkedinIcon size={14} />
+              </a>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   )

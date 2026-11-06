@@ -23,7 +23,8 @@ import { createClient } from '@/lib/supabase/server'
 import { formatDate, formatDateTime, isEventPast, getInitials, categoryLabel } from '@/lib/utils'
 import type { Event, Chapter, NewsArticle, TeamMember } from '@/types/database'
 import { mockEvents, mockChapters, mockNews, mockTeamMembers } from '@/lib/mock-data'
-import EventCountdown from '@/components/public/EventCountdown'
+import SpotlightSection from '@/components/public/SpotlightSection'
+import ParallaxHero from '@/components/public/ParallaxHero'
 
 export const metadata: Metadata = {
   title: 'IEEE Student Branch — Wayamba University of Sri Lanka',
@@ -37,7 +38,7 @@ async function getHomeData() {
   try {
     const supabase = await createClient()
 
-    const [eventsRes, chaptersRes, newsRes, teamRes, hotEventRes] = await Promise.all([
+    const [eventsRes, chaptersRes, newsRes, teamRes, hotEventsRes, settingsRes] = await Promise.all([
       supabase
         .from('events')
         .select('*')
@@ -66,25 +67,37 @@ async function getHomeData() {
         .select('*')
         .eq('status', 'published')
         .eq('featured', true)
-        .order('start_at', { ascending: true })
-        .limit(1)
-        .maybeSingle(),
+        .order('start_at', { ascending: true }),
+      supabase
+        .from('site_settings')
+        .select('*'),
     ])
 
     const events = (eventsRes.data && eventsRes.data.length > 0) ? (eventsRes.data as Event[]) : mockEvents.slice(0, 3)
     const chapters = (chaptersRes.data && chaptersRes.data.length > 0) ? (chaptersRes.data as Chapter[]) : mockChapters
     const news = (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as Partial<NewsArticle>[]) : mockNews.slice(0, 3)
     const team = (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 4)
-    const hotEvent = (hotEventRes?.data as Event | null) ?? (mockEvents.find(e => e.featured) as Event) ?? mockEvents[0]
+    const hotEvents = (hotEventsRes.data && hotEventsRes.data.length > 0)
+      ? (hotEventsRes.data as Event[])
+      : mockEvents.filter(e => e.featured)
 
-    return { events, chapters, news, team, hotEvent }
+    const settingsMap: Record<string, unknown> = {}
+    if (settingsRes.data) {
+      settingsRes.data.forEach((s: { key: string; value: unknown }) => {
+        settingsMap[s.key] = s.value
+      })
+    }
+    const hideSpotlight = settingsMap.show_spotlight_section === false || settingsMap.show_spotlight_section === 'false'
+
+    return { events, chapters, news, team, hotEvents, hideSpotlight }
   } catch {
     return {
       events: mockEvents.slice(0, 3),
       chapters: mockChapters,
       news: mockNews.slice(0, 3),
       team: mockTeamMembers.slice(0, 4),
-      hotEvent: (mockEvents.find(e => e.featured) as Event) ?? mockEvents[0],
+      hotEvents: mockEvents.filter(e => e.featured),
+      hideSpotlight: false,
     }
   }
 }
@@ -104,34 +117,16 @@ const chapterColors: Record<string, string> = {
 }
 
 export default async function HomePage() {
-  const { events, chapters, news, team, hotEvent } = await getHomeData()
+  const { events, chapters, news, team, hotEvents, hideSpotlight } = await getHomeData()
 
   return (
     <>
       {/* ── HERO ── */}
       <section className="relative min-h-screen flex items-center overflow-hidden bg-[var(--color-navy)]" aria-label="Hero">
-        {/* Background image */}
-        <div className="absolute inset-0">
-          <Image
-            src="/hero.jpg"
-            alt="Engineering students collaborating in a university lab"
-            fill
-            className="object-cover object-center"
-            priority
-            quality={90}
-          />
-          {/* Overlay — gradient left to right */}
-          <div className="absolute inset-0 bg-gradient-to-r from-[#071A2B]/95 via-[#071A2B]/75 to-[#071A2B]/30" />
-          <div className="absolute inset-0 bg-gradient-to-t from-[#071A2B]/60 via-transparent to-transparent" />
-        </div>
-
-        {/* Decorative grid */}
-        <div
-          className="absolute inset-0 opacity-10"
-          style={{
-            backgroundImage: `linear-gradient(rgba(22,135,217,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(22,135,217,0.3) 1px, transparent 1px)`,
-            backgroundSize: '60px 60px',
-          }}
+        {/* Parallax Background image & lighting layers */}
+        <ParallaxHero
+          imageSrc="/hero.jpg"
+          alt="Engineering students collaborating in a university lab"
         />
 
         <div className="container relative z-10 py-32 md:py-40">
@@ -425,117 +420,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* ── HOT EVENT SPOTLIGHT ── */}
-      {hotEvent && (
-        <section className="section section-dark overflow-hidden relative">
-          {/* Ambient Glows */}
-          <div
-            className="absolute top-0 right-1/4 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-20"
-            style={{
-              background: 'radial-gradient(circle, var(--color-accent) 0%, transparent 70%)',
-            }}
-          />
-          <div
-            className="absolute bottom-0 left-10 w-96 h-96 rounded-full blur-3xl pointer-events-none opacity-15"
-            style={{
-              background: 'radial-gradient(circle, var(--color-primary) 0%, transparent 70%)',
-            }}
-          />
-
-          <div className="container relative z-10">
-            <div className="grid lg:grid-cols-12 gap-10 items-center">
-              {/* Event Content & Countdown */}
-              <div className="lg:col-span-7 flex flex-col items-start">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[var(--color-accent)]/15 border border-[var(--color-accent)]/30 text-[var(--color-accent)] text-xs font-bold uppercase tracking-wider mb-5">
-                  <Flame className="w-4 h-4 animate-pulse text-[var(--color-accent)]" />
-                  <span>Spotlight Event</span>
-                  <span className="w-1 h-1 rounded-full bg-[var(--color-accent)]" />
-                  <span>{categoryLabel(hotEvent.category)}</span>
-                </div>
-
-                <h2 className="text-white text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight mb-4 leading-[1.15]">
-                  {hotEvent.title}
-                </h2>
-
-                <p className="text-white/75 text-base sm:text-lg leading-relaxed mb-6 max-w-2xl">
-                  {hotEvent.summary || hotEvent.description}
-                </p>
-
-                {/* Event meta tags */}
-                <div className="flex flex-wrap items-center gap-4 text-sm text-white/80 mb-8 pb-6 border-b border-white/10 w-full">
-                  <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
-                    <span>{formatDateTime(hotEvent.start_at)}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <MapPin className="w-4 h-4 text-[var(--color-accent)] shrink-0" />
-                    <span>{hotEvent.is_online ? 'Virtual / Online Stream' : (hotEvent.venue ?? 'WUSL Main Campus')}</span>
-                  </div>
-                  {hotEvent.organizer && (
-                    <div className="flex items-center gap-2 text-white/60 text-xs w-full">
-                      <Users className="w-3.5 h-3.5 text-white/40 shrink-0" />
-                      <span>Organized by {hotEvent.organizer}</span>
-                    </div>
-                  )}
-                </div>
-
-                {/* Live Countdown */}
-                <div className="w-full mb-8">
-                  <EventCountdown targetDate={hotEvent.start_at} eventTitle={hotEvent.title} />
-                </div>
-
-                {/* Actions */}
-                <div className="flex flex-wrap items-center gap-4">
-                  {hotEvent.registration_url && !isEventPast(hotEvent.end_at, hotEvent.start_at) && (
-                    <a
-                      href={hotEvent.registration_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="btn btn-accent text-white font-bold px-6 py-3 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/40 hover:scale-[1.02] transition-all"
-                    >
-                      Register Now
-                      <ArrowRight className="w-4 h-4 ml-1" />
-                    </a>
-                  )}
-                  <Link
-                    href={`/events/${hotEvent.slug}`}
-                    className="btn btn-outline text-white border-white/30 hover:bg-white/10 hover:border-white px-6 py-3"
-                  >
-                    View Event Details
-                  </Link>
-                </div>
-              </div>
-
-              {/* Event Cover Image & Badge */}
-              <div className="lg:col-span-5 relative">
-                <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[4/3] border border-white/15 group">
-                  <Image
-                    src={hotEvent.cover_url || 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=1200&q=80'}
-                    alt={hotEvent.title}
-                    fill
-                    className="object-cover group-hover:scale-105 transition-transform duration-700"
-                    priority
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[var(--color-navy)]/80 via-transparent to-transparent pointer-events-none" />
-
-                  <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-xs text-white">
-                    <span className="px-3 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 font-medium">
-                      IEEE WUSL Premier
-                    </span>
-                    <span className="px-3 py-1 rounded-full bg-[var(--color-accent)] text-white font-bold uppercase tracking-wider text-[10px]">
-                      Open for All
-                    </span>
-                  </div>
-                </div>
-
-                {/* Decorative border backdrop */}
-                <div className="absolute -top-4 -right-4 w-32 h-32 rounded-3xl bg-[var(--color-accent)]/20 border-2 border-[var(--color-accent)]/40 -z-10 blur-sm" />
-                <div className="absolute -bottom-4 -left-4 w-32 h-32 rounded-3xl bg-[var(--color-primary)]/20 border-2 border-[var(--color-primary)]/40 -z-10 blur-sm" />
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* ── HOT EVENTS SPOTLIGHT ── */}
+      <SpotlightSection events={hotEvents} hideSection={hideSpotlight} />
 
       {/* ── LATEST NEWS ── */}
       <section className="section" aria-labelledby="news-heading">
@@ -612,52 +498,78 @@ export default async function HomePage() {
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {team.map((member) => (
-              <div key={member.id} className="card p-6 flex flex-col items-center text-center">
-                <div className="relative w-24 h-24 rounded-full overflow-hidden mb-4 bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white text-xl font-bold shadow-md">
+              <div key={member.id} className="card group flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
+                {/* Full-size Square Photo (Badge Style) */}
+                <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
                   {member.photo_url ? (
-                    <Image
-                      src={member.photo_url}
-                      alt={member.full_name}
-                      fill
-                      className="object-cover"
-                    />
+                    <>
+                      <Image
+                        src={member.photo_url}
+                        alt={member.full_name}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
+                      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                        <span className="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase bg-white/95 text-[var(--color-primary)] shadow-md backdrop-blur-sm">
+                          {member.role_title}
+                        </span>
+                      </div>
+                    </>
                   ) : (
-                    <span>{getInitials(member.full_name)}</span>
+                    <div className="w-full h-full flex flex-col items-center justify-center p-6 text-center text-white">
+                      <span className="text-4xl font-extrabold tracking-tight mb-2 opacity-90">
+                        {getInitials(member.full_name)}
+                      </span>
+                      <span className="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase bg-white/20 text-white backdrop-blur-sm">
+                        {member.role_title}
+                      </span>
+                    </div>
                   )}
                 </div>
 
-                <h3 className="font-bold text-[var(--color-text)] text-base mb-1">{member.full_name}</h3>
-                <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider mb-2">
-                  {member.role_title}
-                </p>
-
-                {member.bio && (
-                  <p className="text-xs text-[var(--color-muted)] leading-relaxed mb-4 line-clamp-2">
-                    {member.bio}
+                {/* Name Tag & Details */}
+                <div className="p-5 flex flex-col flex-1 bg-[var(--color-card)]">
+                  <h3 className="font-bold text-[var(--color-text)] text-base group-hover:text-[var(--color-primary)] transition-colors line-clamp-1 mb-1">
+                    {member.full_name}
+                  </h3>
+                  <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider mb-2">
+                    {member.role_title}
                   </p>
-                )}
 
-                <div className="flex items-center gap-2 mt-auto">
-                  {member.linkedin_url && (
-                    <a
-                      href={member.linkedin_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-7 h-7 rounded-lg bg-[var(--color-surface-2)] text-[var(--color-muted)] hover:text-[var(--color-primary)] flex items-center justify-center transition-colors"
-                      aria-label={`${member.full_name}'s LinkedIn`}
-                    >
-                      <LinkedinIcon className="w-3.5 h-3.5" />
-                    </a>
+                  {member.bio && (
+                    <p className="text-xs text-[var(--color-muted)] line-clamp-2 leading-relaxed mb-4 flex-1">
+                      {member.bio}
+                    </p>
                   )}
-                  {member.email && (
-                    <a
-                      href={`mailto:${member.email}`}
-                      className="w-7 h-7 rounded-lg bg-[var(--color-surface-2)] text-[var(--color-muted)] hover:text-[var(--color-primary)] flex items-center justify-center transition-colors"
-                      aria-label={`Email ${member.full_name}`}
-                    >
-                      <Mail className="w-3.5 h-3.5" />
-                    </a>
-                  )}
+
+                  <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between mt-auto">
+                    <span className="text-[11px] font-medium text-[var(--color-muted)]">
+                      IEEE WUSL
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      {member.email && (
+                        <a
+                          href={`mailto:${member.email}`}
+                          className="w-7 h-7 rounded-lg bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:bg-blue-50 flex items-center justify-center transition-colors"
+                          aria-label={`Email ${member.full_name}`}
+                        >
+                          <Mail className="w-3.5 h-3.5" />
+                        </a>
+                      )}
+                      {member.linkedin_url && (
+                        <a
+                          href={member.linkedin_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-7 h-7 rounded-lg bg-[var(--color-surface)] text-[var(--color-muted)] hover:text-[var(--color-primary)] hover:bg-blue-50 flex items-center justify-center transition-colors"
+                          aria-label={`${member.full_name}'s LinkedIn`}
+                        >
+                          <LinkedinIcon size={14} />
+                        </a>
+                      )}
+                    </div>
+                  </div>
                 </div>
               </div>
             ))}

@@ -88,7 +88,7 @@ export default function Navbar() {
             </Link>
 
             {/* Desktop Nav */}
-            <div className="hidden lg:flex items-center gap-1" ref={dropdownRef}>
+            <div className="hidden lg:flex items-center gap-1.5" ref={dropdownRef}>
               {navLinks.map((link) =>
                 link.children ? (
                   <div key={link.label} className="relative">
@@ -99,14 +99,14 @@ export default function Navbar() {
                         )
                       }
                       className={cn(
-                        'flex items-center gap-1 px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                        'flex items-center gap-1.5 px-4 py-2 rounded-lg text-[15px] font-semibold tracking-wide transition-all duration-200',
                         scrolled
                           ? isActive(link.href)
-                            ? 'text-[var(--color-primary)] bg-blue-50'
+                            ? 'text-[var(--color-primary)] bg-blue-50 font-bold'
                             : 'text-[var(--color-text)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface)]'
                           : isActive(link.href)
-                          ? 'text-white bg-white/15'
-                          : 'text-white/85 hover:text-white hover:bg-white/10'
+                          ? 'text-white bg-white/20 font-bold'
+                          : 'text-white/90 hover:text-white hover:bg-white/10'
                       )}
                       aria-expanded={activeDropdown === link.label}
                       aria-haspopup="true"
@@ -114,21 +114,21 @@ export default function Navbar() {
                       {link.label}
                       <ChevronDown
                         className={cn(
-                          'w-3.5 h-3.5 transition-transform duration-200',
+                          'w-4 h-4 transition-transform duration-200',
                           activeDropdown === link.label && 'rotate-180'
                         )}
                       />
                     </button>
                     {activeDropdown === link.label && (
-                      <div className="absolute top-full left-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-[var(--color-border)] py-1.5 z-50 animate-in fade-in-0 zoom-in-95">
+                      <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-[var(--color-border)] py-2 z-50 animate-in fade-in-0 zoom-in-95">
                         {link.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
                             className={cn(
-                              'flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)]',
+                              'flex items-center gap-2.5 px-4 py-2.5 text-[15px] font-medium transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)]',
                               isActive(child.href)
-                                ? 'text-[var(--color-primary)] bg-blue-50/60'
+                                ? 'text-[var(--color-primary)] bg-blue-50/70 font-semibold'
                                 : 'text-[var(--color-text)]'
                             )}
                           >
@@ -143,14 +143,14 @@ export default function Navbar() {
                     key={link.label}
                     href={link.href}
                     className={cn(
-                      'px-3.5 py-2 rounded-lg text-sm font-medium transition-all duration-200',
+                      'px-4 py-2 rounded-lg text-[15px] font-semibold tracking-wide transition-all duration-200',
                       scrolled
                         ? isActive(link.href)
-                          ? 'text-[var(--color-primary)] bg-blue-50'
+                          ? 'text-[var(--color-primary)] bg-blue-50 font-bold'
                           : 'text-[var(--color-text)] hover:text-[var(--color-primary)] hover:bg-[var(--color-surface)]'
                         : isActive(link.href)
-                        ? 'text-white bg-white/15'
-                        : 'text-white/85 hover:text-white hover:bg-white/10'
+                        ? 'text-white bg-white/20 font-bold'
+                        : 'text-white/90 hover:text-white hover:bg-white/10'
                     )}
                   >
                     {link.label}
@@ -231,13 +231,13 @@ export default function Navbar() {
 
             {/* Links */}
             <nav className="flex-1 overflow-y-auto p-4">
-              <ul className="space-y-0.5" role="list">
+              <ul className="space-y-1" role="list">
                 {navLinks.map((link) => (
                   <li key={link.label}>
                     <Link
                       href={link.href}
                       className={cn(
-                        'flex items-center px-3.5 py-3 rounded-lg font-medium text-sm transition-colors',
+                        'flex items-center px-4 py-3 rounded-xl font-semibold text-[16px] transition-colors',
                         isActive(link.href)
                           ? 'text-[var(--color-primary)] bg-blue-50'
                           : 'text-[var(--color-text)] hover:bg-[var(--color-surface)]'
@@ -246,15 +246,15 @@ export default function Navbar() {
                       {link.label}
                     </Link>
                     {link.children && (
-                      <ul className="ml-3.5 mt-0.5 space-y-0.5 border-l-2 border-[var(--color-border)] pl-3.5">
+                      <ul className="ml-4 mt-1 space-y-1 border-l-2 border-[var(--color-border)] pl-3.5">
                         {link.children.map((child) => (
                           <li key={child.href}>
                             <Link
                               href={child.href}
                               className={cn(
-                                'flex items-center px-3 py-2.5 rounded-lg text-sm transition-colors',
+                                'flex items-center px-3.5 py-2.5 rounded-lg text-[15px] transition-colors',
                                 isActive(child.href)
-                                ? 'text-[var(--color-primary)] font-medium'
+                                ? 'text-[var(--color-primary)] font-semibold'
                                 : 'text-[var(--color-muted)] hover:text-[var(--color-text)]'
                               )}
                             >

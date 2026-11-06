@@ -75,6 +75,7 @@ export interface Event {
   chapter_id: string | null
   status: PublicationStatus
   featured: boolean
+  show_countdown?: boolean
   created_at: string
   updated_at: string
   chapters?: Chapter
@@ -190,6 +191,7 @@ export interface SiteSettings {
   stat_events: number | null
   stat_projects: number | null
   stat_chapters: number | null
+  show_spotlight_section?: boolean
 }
 
 // Supabase DB type map

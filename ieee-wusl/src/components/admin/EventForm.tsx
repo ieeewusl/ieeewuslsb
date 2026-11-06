@@ -25,6 +25,7 @@ interface EventFormData {
   chapter_id: string
   status: PublicationStatus
   featured: boolean
+  show_countdown: boolean
 }
 
 interface EventFormProps {
@@ -56,6 +57,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
     chapter_id: initialData?.chapter_id ?? '',
     status: initialData?.status ?? 'draft',
     featured: initialData?.featured ?? false,
+    show_countdown: initialData?.show_countdown ?? true,
   })
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -90,13 +92,22 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
       }
 
       let err
-      if (mode === 'edit' && initialData?.id) {
-        const { error } = await supabase.from('events').update(payload).eq('id', initialData.id)
-        err = error
-      } else {
-        const { error } = await supabase.from('events').insert([payload])
-        err = error
+      const executeSave = async (data: typeof payload) => {
+        if (mode === 'edit' && initialData?.id) {
+          return await supabase.from('events').update(data).eq('id', initialData.id)
+        } else {
+          return await supabase.from('events').insert([data])
+        }
       }
+
+      let res = await executeSave(payload)
+      // Graceful fallback if show_countdown column is not yet present on remote DB
+      if (res.error && res.error.message?.includes('show_countdown')) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        const { show_countdown, ...fallbackPayload } = payload
+        res = await executeSave(fallbackPayload as typeof payload)
+      }
+      err = res.error
 
       if (err) {
         setError(err.message)
@@ -235,6 +246,25 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
               </div>
               <p className="text-[11px] text-amber-800 leading-relaxed">
                 Highlights this event in the mega featured section on the homepage with an active live countdown timer and prominent registration button!
+              </p>
+            </div>
+
+            {/* Countdown Option Toggle */}
+            <div className="p-3.5 bg-blue-50/70 border border-blue-200/70 rounded-xl space-y-1.5">
+              <div className="flex items-center gap-2.5">
+                <input
+                  id="show_countdown"
+                  type="checkbox"
+                  checked={form.show_countdown}
+                  onChange={e => set('show_countdown', e.target.checked)}
+                  className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 cursor-pointer"
+                />
+                <label htmlFor="show_countdown" className="text-sm font-bold text-blue-950 cursor-pointer flex items-center gap-1.5">
+                  Display Countdown Timer ⏱️
+                </label>
+              </div>
+              <p className="text-[11px] text-blue-800 leading-relaxed">
+                Shows a dynamic live countdown timer to the event start time on spotlight cards and event detail pages.
               </p>
             </div>
 
