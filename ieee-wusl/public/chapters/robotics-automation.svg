@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rasGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8C1D40"/>
+      <stop offset="100%" stop-color="#6B21A8"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Emblem: Gear and Robotic Arm Mechanism -->
+  <g transform="translate(20, 20)">
+    <!-- Industrial Gear Outer -->
+    <path d="M 60 15 
+             L 66 22 L 76 22 L 80 29 L 89 27 L 95 35 L 102 36 L 105 45 L 110 49 L 109 59 L 111 65 L 107 73 L 106 81 L 99 87 L 95 95 L 86 98 L 79 104 L 69 104 L 60 107 L 51 104 L 41 104 L 34 98 L 25 95 L 21 87 L 14 81 L 13 73 L 9 65 L 11 59 L 10 49 L 15 45 L 18 36 L 25 35 L 31 27 L 40 29 L 44 22 L 54 22 Z" 
+          fill="none" stroke="url(#rasGrad)" stroke-width="5" stroke-linejoin="round"/>
+    
+    <!-- Central Hub -->
+    <circle cx="60" cy="60" r="26" fill="url(#rasGrad)" opacity="0.15"/>
+    <circle cx="60" cy="60" r="16" fill="url(#rasGrad)"/>
+    
+    <!-- Robotic Joint Link / Arm -->
+    <path d="M 60 60 L 90 35 L 100 45" fill="none" stroke="#00629B" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+    <circle cx="90" cy="35" r="4.5" fill="#8C1D40"/>
+    <circle cx="100" cy="45" r="3.5" fill="#00629B"/>
+    <circle cx="60" cy="60" r="6" fill="#FFFFFF"/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(145, 42)">
+    <!-- IEEE Brand mark -->
+    <text x="0" y="24" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#00629B" letter-spacing="1.5">
+      IEEE
+    </text>
+    <!-- ROBOTICS & AUTOMATION SOCIETY -->
+    <text x="0" y="55" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="21" font-weight="800" fill="#8C1D40" letter-spacing="0.5">
+      ROBOTICS &amp;
+    </text>
+    <text x="0" y="78" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="20" font-weight="800" fill="#8C1D40" letter-spacing="0.5">
+      AUTOMATION
+    </text>
+    <text x="0" y="98" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="16" font-weight="700" fill="#00629B" letter-spacing="1.2">
+      SOCIETY
+    </text>
+  </g>
+</svg>
+

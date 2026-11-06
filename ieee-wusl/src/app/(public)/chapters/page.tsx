@@ -65,28 +65,44 @@ export default async function ChaptersPage() {
               {chapters.map(chapter => {
                 const gradient = chapterGradients[chapter.slug] ?? 'from-blue-600 to-blue-900'
                 return (
-                  <Link key={chapter.id} href={`/chapters/${chapter.slug}`} className="card group flex gap-6 p-6 md:p-8">
-                    {chapter.logo_url ? (
-                      <div className="relative w-16 h-16 rounded-2xl overflow-hidden shrink-0 p-2 bg-white border border-[var(--color-border)] shadow-md flex items-center justify-center">
-                        <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-2" />
-                      </div>
-                    ) : (
-                      <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shrink-0 shadow-lg`}>
-                        <Cpu className="w-8 h-8 text-white" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h2 className="text-lg font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
-                        IEEE {chapter.name}
-                      </h2>
-                      <p className="text-sm text-[var(--color-muted)] leading-relaxed mb-4">
-                        {chapter.short_desc}
-                      </p>
-                      {chapter.founded_year && (
-                        <p className="text-xs text-[var(--color-muted-light)]">Est. {chapter.founded_year}</p>
+                  <Link
+                    key={chapter.id}
+                    href={`/chapters/${chapter.slug}`}
+                    className="card group flex flex-col sm:flex-row items-center sm:items-start text-center sm:text-left gap-6 p-6 md:p-8 hover:shadow-xl hover:scale-[1.01] transition-all duration-300 border border-[var(--color-border)]"
+                  >
+                    {/* Big Chapter Logo Showcase */}
+                    <div className="relative w-40 h-28 sm:w-44 sm:h-32 rounded-2xl overflow-hidden shrink-0 p-3 bg-white border border-[var(--color-border)]/80 shadow-md flex items-center justify-center group-hover:shadow-lg group-hover:border-[var(--color-primary)]/40 transition-all">
+                      {chapter.logo_url ? (
+                        <Image
+                          src={chapter.logo_url}
+                          alt={`${chapter.name} logo`}
+                          fill
+                          className="object-contain p-2 group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className={`w-full h-full rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg text-white`}>
+                          <Cpu className="w-10 h-10" />
+                        </div>
                       )}
-                      <div className="flex items-center gap-1 mt-3 text-sm font-medium text-[var(--color-primary)]">
-                        Explore chapter <ChevronRight className="w-4 h-4" />
+                    </div>
+
+                    <div className="flex-1 flex flex-col justify-between w-full">
+                      <div>
+                        <h2 className="text-xl font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                          IEEE {chapter.name}
+                        </h2>
+                        <p className="text-sm text-[var(--color-muted)] leading-relaxed mb-4">
+                          {chapter.short_desc}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-3 border-t border-[var(--color-border)] mt-auto w-full">
+                        {chapter.founded_year ? (
+                          <span className="text-xs font-semibold text-[var(--color-muted)]">Est. {chapter.founded_year}</span>
+                        ) : <span />}
+                        <div className="flex items-center gap-1 text-sm font-semibold text-[var(--color-primary)]">
+                          Explore Chapter <ChevronRight className="w-4 h-4" />
+                        </div>
                       </div>
                     </div>
                   </Link>

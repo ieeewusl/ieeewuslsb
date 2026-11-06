@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="csGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F26A36"/>
+      <stop offset="100%" stop-color="#D94814"/>
+    </linearGradient>
+    <linearGradient id="ieeeBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00629B"/>
+      <stop offset="100%" stop-color="#004A75"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Emblem Hexagon Grid / Node Network -->
+  <g transform="translate(20, 20)">
+    <!-- Outer Diamond/Shield -->
+    <path d="M 60 10 L 110 60 L 60 110 L 10 60 Z" fill="none" stroke="url(#csGrad)" stroke-width="6" stroke-linejoin="round"/>
+    <!-- Inner Circuit/Hexagon -->
+    <path d="M 60 28 L 92 60 L 60 92 L 28 60 Z" fill="url(#csGrad)" opacity="0.15"/>
+    <path d="M 60 38 L 82 60 L 60 82 L 38 60 Z" fill="url(#csGrad)"/>
+    <!-- Data Connection Nodes -->
+    <circle cx="60" cy="10" r="5" fill="#00629B"/>
+    <circle cx="110" cy="60" r="5" fill="#00629B"/>
+    <circle cx="60" cy="110" r="5" fill="#00629B"/>
+    <circle cx="10" cy="60" r="5" fill="#00629B"/>
+    <circle cx="60" cy="60" r="6" fill="#FFFFFF"/>
+    <!-- Radiating Lines -->
+    <line x1="60" y1="10" x2="60" y2="38" stroke="#00629B" stroke-width="3"/>
+    <line x1="110" y1="60" x2="82" y2="60" stroke="#00629B" stroke-width="3"/>
+    <line x1="60" y1="110" x2="60" y2="82" stroke="#00629B" stroke-width="3"/>
+    <line x1="10" y1="60" x2="38" y2="60" stroke="#00629B" stroke-width="3"/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(150, 45)">
+    <!-- IEEE Brand mark -->
+    <text x="0" y="24" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#00629B" letter-spacing="1.5">
+      IEEE
+    </text>
+    <!-- COMPUTER SOCIETY text -->
+    <text x="0" y="56" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="24" font-weight="800" fill="#F26A36" letter-spacing="0.5">
+      COMPUTER
+    </text>
+    <text x="0" y="82" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="24" font-weight="800" fill="#00629B" letter-spacing="0.5">
+      SOCIETY
+    </text>
+  </g>
+</svg>
+

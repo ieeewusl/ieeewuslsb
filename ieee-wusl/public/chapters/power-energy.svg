@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 160" width="100%" height="100%">
+  <defs>
+    <linearGradient id="pesGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00843D"/>
+      <stop offset="100%" stop-color="#F7941E"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Emblem: Sun/Power Grid & Lightning Wave -->
+  <g transform="translate(20, 20)">
+    <!-- Outer Gear/Ring Rays -->
+    <circle cx="60" cy="60" r="46" fill="none" stroke="#00843D" stroke-width="5" stroke-dasharray="10 6"/>
+    <!-- Inner Sun/Power Core -->
+    <circle cx="60" cy="60" r="30" fill="url(#pesGrad)" opacity="0.2"/>
+    <circle cx="60" cy="60" r="20" fill="#00843D"/>
+    
+    <!-- Lightning / Energy Bolt -->
+    <path d="M 64 35 L 50 62 L 62 62 L 56 85 L 75 56 L 63 56 Z" fill="#F7941E" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round"/>
+  </g>
+
+  <!-- Typography -->
+  <g transform="translate(145, 42)">
+    <!-- IEEE Brand mark -->
+    <text x="0" y="24" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="28" font-weight="900" fill="#00629B" letter-spacing="1.5">
+      IEEE
+    </text>
+    <!-- POWER & ENERGY SOCIETY -->
+    <text x="0" y="55" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="#00843D" letter-spacing="0.5">
+      POWER &amp;
+    </text>
+    <text x="0" y="80" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="22" font-weight="800" fill="#F7941E" letter-spacing="0.5">
+      ENERGY
+    </text>
+    <text x="0" y="100" font-family="Plus Jakarta Sans, Inter, Arial, sans-serif" font-size="15" font-weight="700" fill="#00629B" letter-spacing="1.2">
+      SOCIETY
+    </text>
+  </g>
+</svg>
+

@@ -74,8 +74,8 @@ export default async function ChapterDetailPage({ params }: { params: Promise<{ 
           <div className="grid lg:grid-cols-3 gap-10">
             <div className="lg:col-span-2">
               {chapter.logo_url && (
-                <div className="relative w-24 h-24 rounded-2xl overflow-hidden mb-8 shadow-lg">
-                  <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-2 bg-[var(--color-surface)]" />
+                <div className="relative w-56 h-32 sm:w-64 sm:h-36 rounded-2xl overflow-hidden mb-8 p-4 bg-white border border-[var(--color-border)] shadow-md flex items-center justify-center">
+                  <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-2" priority />
                 </div>
               )}
               {chapter.description ? (

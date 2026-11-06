@@ -266,7 +266,7 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-5">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {chapters.length > 0
               ? chapters.map((chapter) => {
                 const Icon = chapterIcons[chapter.slug] ?? Cpu
@@ -275,25 +275,34 @@ export default async function HomePage() {
                   <Link
                     key={chapter.id}
                     href={`/chapters/${chapter.slug}`}
-                    className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform"
+                    className="card group p-6 flex flex-col items-center text-center hover:scale-[1.02] hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]"
                   >
-                    {chapter.logo_url ? (
-                      <div className="relative w-12 h-12 rounded-xl overflow-hidden mb-4 p-1.5 bg-white border border-[var(--color-border)] shadow-sm flex items-center justify-center">
-                        <Image src={chapter.logo_url} alt={`${chapter.name} logo`} fill className="object-contain p-1" />
-                      </div>
-                    ) : (
-                      <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                        <Icon className="w-6 h-6 text-white" />
-                      </div>
-                    )}
-                    <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                    {/* Big Centered Chapter Logo */}
+                    <div className="relative w-full h-28 sm:h-32 rounded-2xl bg-white border border-[var(--color-border)]/80 shadow-sm p-4 flex items-center justify-center mb-5 mx-auto group-hover:shadow-md group-hover:border-[var(--color-primary)]/40 transition-all overflow-hidden">
+                      {chapter.logo_url ? (
+                        <Image
+                          src={chapter.logo_url}
+                          alt={`${chapter.name} logo`}
+                          fill
+                          className="object-contain p-2.5 group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <div className={`w-16 h-16 rounded-2xl bg-gradient-to-br ${gradient} flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-300`}>
+                          <Icon className="w-8 h-8 text-white" />
+                        </div>
+                      )}
+                    </div>
+
+                    <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors text-center line-clamp-2">
                       IEEE {chapter.name}
                     </h3>
-                    <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1">
+
+                    <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1 text-center line-clamp-3 mb-4">
                       {chapter.short_desc}
                     </p>
-                    <div className="flex items-center gap-1 mt-4 text-sm font-medium text-[var(--color-primary)]">
-                      Learn more <ChevronRight className="w-3.5 h-3.5" />
+
+                    <div className="flex items-center justify-center gap-1.5 text-sm font-semibold text-[var(--color-primary)] pt-3 border-t border-[var(--color-border)] w-full">
+                      Explore Chapter <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </Link>
                 )
@@ -307,16 +316,25 @@ export default async function HomePage() {
               ].map(({ slug, name, desc, Icon }) => {
                 const gradient = chapterColors[slug] ?? 'from-blue-600 to-blue-800'
                 return (
-                  <Link key={slug} href={`/chapters/${slug}`} className="card group p-6 flex flex-col hover:scale-[1.02] transition-transform">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${gradient} flex items-center justify-center mb-4 shadow-lg`}>
-                      <Icon className="w-6 h-6 text-white" />
+                  <Link
+                    key={slug}
+                    href={`/chapters/${slug}`}
+                    className="card group p-6 flex flex-col items-center text-center hover:scale-[1.02] hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]"
+                  >
+                    <div className="relative w-full h-28 sm:h-32 rounded-2xl bg-white border border-[var(--color-border)]/80 shadow-sm p-4 flex items-center justify-center mb-5 mx-auto group-hover:shadow-md group-hover:border-[var(--color-primary)]/40 transition-all overflow-hidden">
+                      <Image
+                        src={`/chapters/${slug}.svg`}
+                        alt={`IEEE ${name} logo`}
+                        fill
+                        className="object-contain p-2.5 group-hover:scale-105 transition-transform duration-300"
+                      />
                     </div>
-                    <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors">
+                    <h3 className="text-base font-bold text-[var(--color-text)] mb-2 group-hover:text-[var(--color-primary)] transition-colors text-center line-clamp-2">
                       IEEE {name}
                     </h3>
-                    <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1">{desc}</p>
-                    <div className="flex items-center gap-1 mt-4 text-sm font-medium text-[var(--color-primary)]">
-                      Learn more <ChevronRight className="w-3.5 h-3.5" />
+                    <p className="text-sm text-[var(--color-muted)] leading-relaxed flex-1 text-center line-clamp-3 mb-4">{desc}</p>
+                    <div className="flex items-center justify-center gap-1.5 text-sm font-semibold text-[var(--color-primary)] pt-3 border-t border-[var(--color-border)] w-full">
+                      Explore Chapter <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </Link>
                 )
