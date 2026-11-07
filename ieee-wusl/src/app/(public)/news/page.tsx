@@ -11,22 +11,32 @@ export const metadata: Metadata = {
   description: 'Latest news, announcements, event recaps, and updates from the IEEE Student Branch at Wayamba University of Sri Lanka.',
 }
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 import { mockNews } from '@/lib/mock-data'
 
 async function getArticles(): Promise<Partial<NewsArticle>[]> {
+  const isSupabaseConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder-wusl')
+  )
+
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('news_articles')
       .select('id,title,slug,summary,cover_url,published_at,tags,author_name')
       .eq('status', 'published')
       .order('published_at', { ascending: false })
+
+    if (isSupabaseConfigured && !error && data) {
+      return data
+    }
     if (data && data.length > 0) return data
-    return mockNews
+    return isSupabaseConfigured ? [] : mockNews
   } catch {
-    return mockNews
+    return isSupabaseConfigured ? [] : mockNews
   }
 }
 

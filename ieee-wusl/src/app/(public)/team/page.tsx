@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   description: 'Meet the dedicated executive committee members leading the IEEE Student Branch at Wayamba University of Sri Lanka.',
 }
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 import { mockTeamMembers } from '@/lib/mock-data'
 
@@ -29,6 +30,11 @@ const defaultTerms: CommitteeTerm[] = [
 ]
 
 async function getTeam() {
+  const isSupabaseConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder-wusl')
+  )
+
   try {
     const supabase = await createClient()
     const { data: terms } = await supabase
@@ -36,11 +42,18 @@ async function getTeam() {
       .select('*')
       .order('start_year', { ascending: false })
 
-    const { data: members } = await supabase
+    const { data: members, error } = await supabase
       .from('team_members')
       .select('*, committee_terms(label)')
       .eq('status', 'published')
       .order('display_order', { ascending: true })
+
+    if (isSupabaseConfigured && !error && members) {
+      return {
+        terms: (terms ?? defaultTerms) as CommitteeTerm[],
+        members: members as TeamMember[],
+      }
+    }
 
     if (members && members.length > 0) {
       return {
@@ -49,7 +62,7 @@ async function getTeam() {
       }
     }
   } catch {}
-  return { terms: defaultTerms, members: mockTeamMembers }
+  return { terms: defaultTerms, members: isSupabaseConfigured ? [] : mockTeamMembers }
 }
 
 export default async function TeamPage() {

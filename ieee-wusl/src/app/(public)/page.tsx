@@ -32,9 +32,15 @@ export const metadata: Metadata = {
     'The IEEE Student Branch at Wayamba University of Sri Lanka. Engineering Ideas. Creating Impact.',
 }
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 async function getHomeData() {
+  const isSupabaseConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder-wusl')
+  )
+
   try {
     const supabase = await createClient()
 
@@ -73,13 +79,27 @@ async function getHomeData() {
         .select('*'),
     ])
 
-    const events = (eventsRes.data && eventsRes.data.length > 0) ? (eventsRes.data as Event[]) : mockEvents.slice(0, 3)
-    const chapters = (chaptersRes.data && chaptersRes.data.length > 0) ? (chaptersRes.data as Chapter[]) : mockChapters
-    const news = (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as Partial<NewsArticle>[]) : mockNews.slice(0, 3)
-    const team = (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 4)
-    const hotEvents = (hotEventsRes.data && hotEventsRes.data.length > 0)
+    // If Supabase is connected, trust its database results directly (so deletions/empty states work properly)
+    const events = isSupabaseConfigured && !eventsRes.error && eventsRes.data
+      ? (eventsRes.data as Event[])
+      : (eventsRes.data && eventsRes.data.length > 0) ? (eventsRes.data as Event[]) : mockEvents.slice(0, 3)
+
+    const chapters = isSupabaseConfigured && !chaptersRes.error && chaptersRes.data
+      ? (chaptersRes.data as Chapter[])
+      : (chaptersRes.data && chaptersRes.data.length > 0) ? (chaptersRes.data as Chapter[]) : mockChapters
+
+    const news = isSupabaseConfigured && !newsRes.error && newsRes.data
+      ? (newsRes.data as Partial<NewsArticle>[])
+      : (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as Partial<NewsArticle>[]) : mockNews.slice(0, 3)
+
+    const team = isSupabaseConfigured && !teamRes.error && teamRes.data
+      ? (teamRes.data as TeamMember[])
+      : (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 4)
+
+    // For Hot Events: if Supabase is connected, whatever is in the DB is truth! If 0 featured events, hotEvents is [] and spotlight hides.
+    const hotEvents = isSupabaseConfigured && !hotEventsRes.error && hotEventsRes.data
       ? (hotEventsRes.data as Event[])
-      : mockEvents.filter(e => e.featured)
+      : (hotEventsRes.data && hotEventsRes.data.length > 0) ? (hotEventsRes.data as Event[]) : mockEvents.filter(e => e.featured)
 
     const settingsMap: Record<string, unknown> = {}
     if (settingsRes.data) {
@@ -92,11 +112,11 @@ async function getHomeData() {
     return { events, chapters, news, team, hotEvents, hideSpotlight }
   } catch {
     return {
-      events: mockEvents.slice(0, 3),
-      chapters: mockChapters,
-      news: mockNews.slice(0, 3),
-      team: mockTeamMembers.slice(0, 4),
-      hotEvents: mockEvents.filter(e => e.featured),
+      events: isSupabaseConfigured ? [] : mockEvents.slice(0, 3),
+      chapters: isSupabaseConfigured ? [] : mockChapters,
+      news: isSupabaseConfigured ? [] : mockNews.slice(0, 3),
+      team: isSupabaseConfigured ? [] : mockTeamMembers.slice(0, 4),
+      hotEvents: isSupabaseConfigured ? [] : mockEvents.filter(e => e.featured),
       hideSpotlight: false,
     }
   }

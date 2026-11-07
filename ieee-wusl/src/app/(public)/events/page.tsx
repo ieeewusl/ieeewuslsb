@@ -11,22 +11,32 @@ export const metadata: Metadata = {
   description: 'Discover upcoming and past IEEE WUSL events — workshops, seminars, competitions, hackathons, and more.',
 }
 
-export const revalidate = 60
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 import { mockEvents } from '@/lib/mock-data'
 
 async function getEvents() {
+  const isSupabaseConfigured = Boolean(
+    process.env.NEXT_PUBLIC_SUPABASE_URL &&
+    !process.env.NEXT_PUBLIC_SUPABASE_URL.includes('placeholder-wusl')
+  )
+
   try {
     const supabase = await createClient()
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('events')
       .select('*')
       .eq('status', 'published')
       .order('start_at', { ascending: false })
+
+    if (isSupabaseConfigured && !error && data) {
+      return data as Event[]
+    }
     if (data && data.length > 0) return data as Event[]
-    return mockEvents
+    return isSupabaseConfigured ? [] : mockEvents
   } catch {
-    return mockEvents
+    return isSupabaseConfigured ? [] : mockEvents
   }
 }
 
