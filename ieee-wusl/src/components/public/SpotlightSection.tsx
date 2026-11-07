@@ -25,8 +25,11 @@ export default function SpotlightSection({ events, hideSection = false }: Spotli
   if (!currentEvent) return null
 
   const isPast = isEventPast(currentEvent.end_at, currentEvent.start_at)
-  // Default show_countdown to true unless explicitly set to false
-  const showCountdown = currentEvent.show_countdown !== false
+  // Check if countdown is turned off (either via show_countdown=false or via <!--no-countdown--> marker)
+  const isCountdownDisabled =
+    currentEvent.show_countdown === false ||
+    Boolean(currentEvent.description?.includes('<!--no-countdown-->'))
+  const showCountdown = !isCountdownDisabled && !isPast
 
   return (
     <section className="section section-dark overflow-hidden relative" aria-label="Spotlight Events">

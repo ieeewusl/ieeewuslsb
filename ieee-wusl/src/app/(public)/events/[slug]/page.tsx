@@ -84,7 +84,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
                 </div>
               )}
               {event.description ? (
-                <div className="prose-content" dangerouslySetInnerHTML={{ __html: event.description }} />
+                <div className="prose-content" dangerouslySetInnerHTML={{ __html: event.description.replace(/<!--no-countdown-->/g, '') }} />
               ) : (
                 <p className="text-[var(--color-muted)]">No additional details available for this event.</p>
               )}
@@ -93,7 +93,7 @@ export default async function EventDetailPage({ params }: { params: Promise<{ sl
             {/* Sidebar */}
             <div className="space-y-5">
               {/* Live Countdown Card */}
-              {!past && event.show_countdown !== false && (
+              {!past && event.show_countdown !== false && !event.description?.includes('<!--no-countdown-->') && (
                 <div className="card p-6 bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-navy-800)] text-white shadow-xl border border-white/10">
                   <div className="flex items-center gap-2 text-xs font-bold text-[var(--color-accent)] uppercase tracking-wider mb-3">
                     <Clock className="w-3.5 h-3.5" />

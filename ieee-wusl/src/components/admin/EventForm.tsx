@@ -40,11 +40,20 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
 
+  const hasNoCountdownMarker = initialData?.description?.includes('<!--no-countdown-->')
+  const initialShowCountdown =
+    initialData?.show_countdown === false || hasNoCountdownMarker
+      ? false
+      : (initialData?.show_countdown ?? true)
+  const initialCleanDescription = (initialData?.description ?? '')
+    .replace(/<!--no-countdown-->/g, '')
+    .trim()
+
   const [form, setForm] = useState<EventFormData>({
     title: initialData?.title ?? '',
     slug: initialData?.slug ?? '',
     summary: initialData?.summary ?? '',
-    description: initialData?.description ?? '',
+    description: initialCleanDescription,
     category: initialData?.category ?? 'other',
     start_at: initialData?.start_at ? new Date(initialData.start_at).toISOString().slice(0, 16) : '',
     end_at: initialData?.end_at ? new Date(initialData.end_at).toISOString().slice(0, 16) : '',
@@ -57,7 +66,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
     chapter_id: initialData?.chapter_id ?? '',
     status: initialData?.status ?? 'draft',
     featured: initialData?.featured ?? false,
-    show_countdown: initialData?.show_countdown ?? true,
+    show_countdown: initialShowCountdown,
   })
 
   function handleTitleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -79,8 +88,16 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
 
     startTransition(async () => {
       const supabase = createClient()
+
+      // Ensure description reflects countdown state regardless of whether the database has the column yet
+      let cleanDescription = form.description.replace(/<!--no-countdown-->/g, '').trim()
+      if (!form.show_countdown) {
+        cleanDescription = cleanDescription ? `${cleanDescription}\n<!--no-countdown-->` : '<!--no-countdown-->'
+      }
+
       const payload = {
         ...form,
+        description: cleanDescription || null,
         start_at: form.start_at ? new Date(form.start_at).toISOString() : null,
         end_at: form.end_at ? new Date(form.end_at).toISOString() : null,
         chapter_id: form.chapter_id || null,
@@ -102,7 +119,7 @@ export default function EventForm({ initialData, chapters, mode }: EventFormProp
 
       let res = await executeSave(payload)
       // Graceful fallback if show_countdown column is not yet present on remote DB
-      if (res.error && res.error.message?.includes('show_countdown')) {
+      if (res.error && res.error.message?.toLowerCase().includes('show_countdown')) {
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { show_countdown, ...fallbackPayload } = payload
         res = await executeSave(fallbackPayload as typeof payload)
