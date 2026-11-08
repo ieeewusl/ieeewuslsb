@@ -67,7 +67,7 @@ async function getHomeData() {
         .select('*')
         .eq('status', 'published')
         .order('display_order', { ascending: true })
-        .limit(4),
+        .limit(7),
       supabase
         .from('events')
         .select('*')
@@ -94,7 +94,7 @@ async function getHomeData() {
 
     const team = isSupabaseConfigured && !teamRes.error && teamRes.data
       ? (teamRes.data as TeamMember[])
-      : (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 4)
+      : (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 7)
 
     // For Hot Events: if Supabase is connected, whatever is in the DB is truth! If 0 featured events, hotEvents is [] and spotlight hides.
     const hotEvents = isSupabaseConfigured && !hotEventsRes.error && hotEventsRes.data
@@ -115,7 +115,7 @@ async function getHomeData() {
       events: isSupabaseConfigured ? [] : mockEvents.slice(0, 3),
       chapters: isSupabaseConfigured ? [] : mockChapters,
       news: isSupabaseConfigured ? [] : mockNews.slice(0, 3),
-      team: isSupabaseConfigured ? [] : mockTeamMembers.slice(0, 4),
+      team: isSupabaseConfigured ? [] : mockTeamMembers.slice(0, 7),
       hotEvents: isSupabaseConfigured ? [] : mockEvents.filter(e => e.featured),
       hideSpotlight: false,
     }
@@ -262,7 +262,7 @@ export default async function HomePage() {
                   <Award className="w-6 h-6" />
                 </div>
                 <div>
-                  <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider">Region 10</div>
+                  <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider">WUSL</div>
                   <div className="font-bold text-[var(--color-text)]">Active SB Community</div>
                 </div>
               </div>
@@ -534,9 +534,14 @@ export default async function HomePage() {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {team.map((member) => (
-              <div key={member.id} className="card group flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
+          <div className="space-y-6">
+            {[team.slice(0, 3), team.slice(3, 7)].map((row, rowIndex) => row.length > 0 && (
+              <div
+                key={rowIndex}
+                className={`grid grid-cols-1 ${rowIndex === 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-4'} gap-6`}
+              >
+                {row.map((member) => (
+                  <div key={member.id} className="card group flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
                 {/* Full-size Square Photo (Badge Style) */}
                 <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
                   {member.photo_url ? (
@@ -609,6 +614,8 @@ export default async function HomePage() {
                     </div>
                   </div>
                 </div>
+                  </div>
+                ))}
               </div>
             ))}
           </div>

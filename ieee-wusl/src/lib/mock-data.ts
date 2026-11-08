@@ -377,6 +377,22 @@ export const mockTeamMembers: TeamMember[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
+  {
+    id: 'm7',
+    full_name: 'Dinuka Perera',
+    role_title: 'Technical Activities Coordinator',
+    bio: 'Coordinating technical programs, workshops, and hands-on learning opportunities for branch members.',
+    photo_url: null,
+    photo_path: null,
+    email: 'technical.ieee.wusl@gmail.com',
+    linkedin_url: 'https://www.linkedin.com',
+    display_order: 7,
+    is_active: true,
+    term_id: '11111111-1111-1111-1111-111111111111',
+    status: 'published',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
 ]
 
 export const mockGalleryAlbums: GalleryAlbum[] = [
