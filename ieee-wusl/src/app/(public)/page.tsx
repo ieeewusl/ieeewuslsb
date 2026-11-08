@@ -538,10 +538,10 @@ export default async function HomePage() {
             {[team.slice(0, 3), team.slice(3, 7)].map((row, rowIndex) => row.length > 0 && (
               <div
                 key={rowIndex}
-                className={`grid grid-cols-1 ${rowIndex === 0 ? 'sm:grid-cols-3' : 'sm:grid-cols-4'} gap-6`}
+                className="grid grid-cols-1 sm:grid-cols-4 gap-6"
               >
                 {row.map((member) => (
-                  <div key={member.id} className="card group flex flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
+                  <div key={member.id} className="card group flex h-full flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
                 {/* Full-size Square Photo (Badge Style) */}
                 <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
                   {member.photo_url ? (
