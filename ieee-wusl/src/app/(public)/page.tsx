@@ -66,8 +66,7 @@ async function getHomeData() {
         .from('team_members')
         .select('*')
         .eq('status', 'published')
-        .order('display_order', { ascending: true })
-        .limit(7),
+        .order('display_order', { ascending: true }),
       supabase
         .from('events')
         .select('*')
@@ -92,9 +91,14 @@ async function getHomeData() {
       ? (newsRes.data as Partial<NewsArticle>[])
       : (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as Partial<NewsArticle>[]) : mockNews.slice(0, 3)
 
-    const team = isSupabaseConfigured && !teamRes.error && teamRes.data
+    const allMembers = isSupabaseConfigured && !teamRes.error && teamRes.data
       ? (teamRes.data as TeamMember[])
-      : (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers.slice(0, 7)
+      : (teamRes.data && teamRes.data.length > 0) ? (teamRes.data as TeamMember[]) : mockTeamMembers
+
+    // Home page leadership showcase displays the Executive Committee (top 7)
+    const team = allMembers
+      .filter(m => (m.committee_type ?? 'executive') === 'executive')
+      .slice(0, 7)
 
     // For Hot Events: if Supabase is connected, whatever is in the DB is truth! If 0 featured events, hotEvents is [] and spotlight hides.
     const hotEvents = isSupabaseConfigured && !hotEventsRes.error && hotEventsRes.data
@@ -115,7 +119,7 @@ async function getHomeData() {
       events: isSupabaseConfigured ? [] : mockEvents.slice(0, 3),
       chapters: isSupabaseConfigured ? [] : mockChapters,
       news: isSupabaseConfigured ? [] : mockNews.slice(0, 3),
-      team: isSupabaseConfigured ? [] : mockTeamMembers.slice(0, 7),
+      team: isSupabaseConfigured ? [] : mockTeamMembers.filter(m => (m.committee_type ?? 'executive') === 'executive').slice(0, 7),
       hotEvents: isSupabaseConfigured ? [] : mockEvents.filter(e => e.featured),
       hideSpotlight: false,
     }

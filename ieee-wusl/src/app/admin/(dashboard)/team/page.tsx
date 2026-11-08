@@ -60,6 +60,7 @@ export default async function AdminTeamPage() {
               <tr className="border-b border-[var(--color-border)] bg-[var(--color-surface)]">
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wide">Member</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wide hidden md:table-cell">Role</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wide hidden sm:table-cell">Type</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wide hidden lg:table-cell">Term</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wide">Status</th>
                 <th className="px-4 py-3 text-right text-xs font-semibold text-[var(--color-muted)] uppercase tracking-wide">Actions</th>
@@ -86,6 +87,15 @@ export default async function AdminTeamPage() {
                     </div>
                   </td>
                   <td className="px-4 py-3.5 hidden md:table-cell text-[var(--color-muted)]">{member.role_title}</td>
+                  <td className="px-4 py-3.5 hidden sm:table-cell">
+                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-[11px] font-semibold ${
+                      (member as any).committee_type === 'standing'
+                        ? 'bg-purple-50 text-purple-700 border border-purple-200'
+                        : 'bg-blue-50 text-blue-700 border border-blue-200'
+                    }`}>
+                      {(member as any).committee_type === 'standing' ? 'Standing' : 'Executive'}
+                    </span>
+                  </td>
                   <td className="px-4 py-3.5 hidden lg:table-cell text-[var(--color-muted)] text-xs">
                     {(member as any).committee_terms?.label ?? '—'}
                   </td>

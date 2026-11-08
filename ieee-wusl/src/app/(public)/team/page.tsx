@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, Users, Mail, ChevronDown } from 'lucide-react'
+import { ArrowRight, Users, Mail, ChevronDown, Award } from 'lucide-react'
 import { LinkedinIcon } from '@/components/ui/SocialIcons'
 import { createClient } from '@/lib/supabase/server'
 import { getInitials } from '@/lib/utils'
@@ -104,17 +104,32 @@ export default async function TeamPage() {
             <>
               {/* Current term */}
               {currentTerm && membersByTerm[currentTerm.id]?.length > 0 && (
-                <div className="mb-16">
+                <div className="mb-20 pb-12 border-b border-[var(--color-border)]">
                   <div className="flex items-center gap-3 mb-10">
-                    <h2 className="text-2xl font-bold text-[var(--color-text)]">
+                    <h2 className="text-3xl font-extrabold text-[var(--color-text)]">
                       {currentTerm.label} Committee
                     </h2>
-                    <span className="badge badge-success">Current</span>
+                    <span className="badge badge-success text-xs px-2.5 py-1">Current</span>
                   </div>
-                  <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {membersByTerm[currentTerm.id].map(member => (
-                      <MemberCard key={member.id} member={member} />
-                    ))}
+
+                  <div className="space-y-12">
+                    <CommitteeGroup
+                      title="Executive Committee"
+                      subtitle="Core leadership guiding IEEE WUSL strategy, operations, and governance"
+                      icon={Award}
+                      members={membersByTerm[currentTerm.id].filter(
+                        m => (m.committee_type ?? 'executive') === 'executive'
+                      )}
+                    />
+
+                    <CommitteeGroup
+                      title="Standing Committee"
+                      subtitle="Coordinators and portfolio leads driving projects, outreach, and technical development"
+                      icon={Users}
+                      members={membersByTerm[currentTerm.id].filter(
+                        m => m.committee_type === 'standing'
+                      )}
+                    />
                   </div>
                 </div>
               )}
@@ -122,23 +137,47 @@ export default async function TeamPage() {
               {/* Past terms */}
               {terms
                 .filter(t => !t.is_current && membersByTerm[t.id]?.length > 0)
-                .map(term => (
-                  <div key={term.id} className="mb-14">
-                    <h2 className="text-xl font-bold text-[var(--color-muted)] mb-8">
-                      {term.label} Committee
-                    </h2>
-                    <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 opacity-80">
-                      {membersByTerm[term.id].map(member => (
-                        <MemberCard key={member.id} member={member} />
-                      ))}
+                .map(term => {
+                  const exec = membersByTerm[term.id].filter(
+                    m => (m.committee_type ?? 'executive') === 'executive'
+                  )
+                  const standing = membersByTerm[term.id].filter(
+                    m => m.committee_type === 'standing'
+                  )
+
+                  return (
+                    <div key={term.id} className="mb-16">
+                      <div className="flex items-center gap-3 mb-8">
+                        <h2 className="text-2xl font-bold text-[var(--color-muted)]">
+                          {term.label} Committee
+                        </h2>
+                      </div>
+
+                      <div className="space-y-10">
+                        <CommitteeGroup
+                          title="Executive Committee"
+                          icon={Award}
+                          members={exec}
+                        />
+
+                        <CommitteeGroup
+                          title="Standing Committee"
+                          icon={Users}
+                          members={standing}
+                        />
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
 
               {/* Ungrouped */}
               {ungrouped.length > 0 && (
-                <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                  {ungrouped.map(member => <MemberCard key={member.id} member={member} />)}
+                <div className="mt-12">
+                  <CommitteeGroup
+                    title="Other Committee Members"
+                    icon={Users}
+                    members={ungrouped}
+                  />
                 </div>
               )}
             </>
@@ -146,6 +185,42 @@ export default async function TeamPage() {
         </div>
       </section>
     </>
+  )
+}
+
+function CommitteeGroup({
+  title,
+  subtitle,
+  icon: Icon,
+  members,
+}: {
+  title: string
+  subtitle?: string
+  icon: React.ComponentType<{ className?: string }>
+  members: TeamMember[]
+}) {
+  if (members.length === 0) return null
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center gap-3 pb-3 border-b border-[var(--color-border)]">
+        <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center text-[var(--color-primary)]">
+          <Icon className="w-5 h-5" />
+        </div>
+        <div>
+          <h3 className="text-xl font-bold text-[var(--color-text)]">{title}</h3>
+          {subtitle && <p className="text-xs text-[var(--color-muted)] mt-0.5">{subtitle}</p>}
+        </div>
+        <span className="ml-auto text-xs font-semibold px-2.5 py-1 rounded-full bg-[var(--color-surface)] text-[var(--color-muted)] border border-[var(--color-border)]">
+          {members.length} {members.length === 1 ? 'member' : 'members'}
+        </span>
+      </div>
+      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {members.map(member => (
+          <MemberCard key={member.id} member={member} />
+        ))}
+      </div>
+    </div>
   )
 }
 
@@ -207,7 +282,7 @@ function MemberCard({ member }: { member: TeamMember }) {
 
         <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between mt-auto">
           <span className="text-[11px] font-medium text-[var(--color-muted)]">
-            IEEE WUSL
+            {member.committee_type === 'standing' ? 'Standing Committee' : 'Executive Committee'}
           </span>
           <div className="flex items-center gap-1.5">
             {member.email && (

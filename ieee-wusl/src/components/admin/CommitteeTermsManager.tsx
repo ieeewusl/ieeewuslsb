@@ -287,3 +287,4 @@ export default function CommitteeTermsManager({ terms }: { terms: CommitteeTerm[
     </>
   )
 }
+

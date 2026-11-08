@@ -1,6 +1,7 @@
 export type UserRole = 'super_admin' | 'administrator' | 'editor'
 export type PublicationStatus = 'draft' | 'published' | 'archived'
 export type EventCategory = 'workshop' | 'seminar' | 'competition' | 'social' | 'webinar' | 'conference' | 'hackathon' | 'other'
+export type CommitteeType = 'executive' | 'standing'
 
 export interface Profile {
   id: string
@@ -34,6 +35,7 @@ export interface TeamMember {
   display_order: number
   is_active: boolean
   term_id: string | null
+  committee_type?: CommitteeType
   status: PublicationStatus
   created_at: string
   updated_at: string

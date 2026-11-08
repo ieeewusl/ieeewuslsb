@@ -16,6 +16,7 @@ interface MemberFormData {
   photo_url: string | null
   display_order: number
   term_id: string
+  committee_type: 'executive' | 'standing'
   status: PublicationStatus
 }
 
@@ -40,6 +41,7 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
     photo_url: initialData?.photo_url ?? null,
     display_order: initialData?.display_order ?? 0,
     term_id: initialData?.term_id ?? '',
+    committee_type: (initialData as any)?.committee_type ?? 'executive',
     status: initialData?.status ?? 'draft',
   })
 
@@ -68,17 +70,31 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
         photo_path: form.photo_url || null,
         display_order: Number(form.display_order) || 0,
         term_id: form.term_id || null,
+        committee_type: form.committee_type,
         status: form.status,
       }
 
       let memberId = initialData?.id
 
       if (mode === 'create') {
-        const { data, error } = await supabase.from('team_members').insert([payload]).select('id').single()
-        if (error) { setError(error.message); return }
+        let { data, error } = await supabase.from('team_members').insert([payload]).select('id').single()
+        if (error && error.message.toLowerCase().includes('committee_type')) {
+          const fallbackPayload = { ...payload }
+          delete fallbackPayload.committee_type
+          const res = await supabase.from('team_members').insert([fallbackPayload]).select('id').single()
+          data = res.data
+          error = res.error
+        }
+        if (error || !data) { setError(error?.message || 'Failed to create member'); return }
         memberId = data.id
       } else {
-        const { error } = await supabase.from('team_members').update(payload).eq('id', memberId!)
+        let { error } = await supabase.from('team_members').update(payload).eq('id', memberId!)
+        if (error && error.message.toLowerCase().includes('committee_type')) {
+          const fallbackPayload = { ...payload }
+          delete fallbackPayload.committee_type
+          const res = await supabase.from('team_members').update(fallbackPayload).eq('id', memberId!)
+          error = res.error
+        }
         if (error) { setError(error.message); return }
       }
 
@@ -161,6 +177,22 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
                 <option value="published">Published</option>
                 <option value="archived">Archived</option>
               </select>
+            </div>
+
+            <div>
+              <label className="label" htmlFor="committee_type">Committee Type</label>
+              <select
+                id="committee_type"
+                value={form.committee_type}
+                onChange={e => set('committee_type', e.target.value as 'executive' | 'standing')}
+                className="input"
+              >
+                <option value="executive">Executive Committee</option>
+                <option value="standing">Standing Committee</option>
+              </select>
+              <span className="text-xs text-[var(--color-muted)] mt-1 block">
+                Executive members appear on both the Home Page and Team page. Standing members appear under Standing Committee on the Team page.
+              </span>
             </div>
 
             <div>
