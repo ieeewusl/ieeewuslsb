@@ -7,6 +7,7 @@ import { getInitials } from '@/lib/utils'
 import type { TeamMember, CommitteeTerm } from '@/types/database'
 import AdminDeleteButton from '@/components/admin/AdminDeleteButton'
 import AdminStatusToggle from '@/components/admin/AdminStatusToggle'
+import CommitteeTermsManager from '@/components/admin/CommitteeTermsManager'
 
 export const metadata: Metadata = { title: 'Team | Admin' }
 export const revalidate = 0
@@ -28,14 +29,19 @@ export default async function AdminTeamPage() {
 
   return (
     <div className="max-w-6xl">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold text-[var(--color-text)]">Team Members</h1>
-          <p className="text-sm text-[var(--color-muted)] mt-1">{members.length} members</p>
+          <p className="text-sm text-[var(--color-muted)] mt-1">
+            {members.length} members across {terms.length} committee terms
+          </p>
         </div>
-        <Link href="/admin/team/new" className="btn btn-primary btn-sm">
-          <Plus className="w-4 h-4" /> Add Member
-        </Link>
+        <div className="flex items-center gap-3">
+          <CommitteeTermsManager terms={terms} />
+          <Link href="/admin/team/new" className="btn btn-primary btn-sm">
+            <Plus className="w-4 h-4" /> Add Member
+          </Link>
+        </div>
       </div>
 
       {members.length === 0 ? (
