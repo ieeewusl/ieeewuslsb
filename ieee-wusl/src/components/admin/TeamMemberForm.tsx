@@ -3,10 +3,9 @@
 import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { slugify } from '@/lib/utils'
-import { Loader2, AlertCircle, CheckCircle2, Upload, X } from 'lucide-react'
+import { Loader2, AlertCircle, CheckCircle2 } from 'lucide-react'
 import type { PublicationStatus, CommitteeTerm, TeamMember } from '@/types/database'
-import Image from 'next/image'
+import ImageUpload from './ImageUpload'
 
 interface MemberFormData {
   full_name: string
@@ -14,6 +13,7 @@ interface MemberFormData {
   bio: string
   email: string
   linkedin_url: string
+  photo_url: string | null
   display_order: number
   term_id: string
   status: PublicationStatus
@@ -30,9 +30,6 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
-  const [photoPreview, setPhotoPreview] = useState<string | null>(initialData?.photo_url ?? null)
-  const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const [uploadingPhoto, setUploadingPhoto] = useState(false)
 
   const [form, setForm] = useState<MemberFormData>({
     full_name: initialData?.full_name ?? '',
@@ -40,6 +37,7 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
     bio: initialData?.bio ?? '',
     email: initialData?.email ?? '',
     linkedin_url: initialData?.linkedin_url ?? '',
+    photo_url: initialData?.photo_url ?? null,
     display_order: initialData?.display_order ?? 0,
     term_id: initialData?.term_id ?? '',
     status: initialData?.status ?? 'draft',
@@ -49,40 +47,28 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
     setForm(prev => ({ ...prev, [field]: value }))
   }
 
-  function handlePhotoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0]
-    if (!file) return
-    if (!file.type.startsWith('image/')) { setError('Please select an image file.'); return }
-    if (file.size > 5 * 1024 * 1024) { setError('Image must be under 5 MB.'); return }
-    setPhotoFile(file)
-    setPhotoPreview(URL.createObjectURL(file))
-    setError(null)
-  }
-
-  async function uploadPhoto(file: File, memberId: string): Promise<string | null> {
-    setUploadingPhoto(true)
-    const supabase = createClient()
-    const ext = file.name.split('.').pop()
-    const path = `team/${memberId}.${ext}`
-    const { error } = await supabase.storage.from('media').upload(path, file, { upsert: true })
-    if (error) { setError(`Photo upload failed: ${error.message}`); setUploadingPhoto(false); return null }
-    const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(path)
-    setUploadingPhoto(false)
-    return publicUrl
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError(null)
 
+    if (!form.full_name.trim() || !form.role_title.trim()) {
+      setError('Full name and role/title are required.')
+      return
+    }
+
     startTransition(async () => {
       const supabase = createClient()
       const payload: Record<string, unknown> = {
-        ...form,
-        term_id: form.term_id || null,
+        full_name: form.full_name,
+        role_title: form.role_title,
+        bio: form.bio || null,
         email: form.email || null,
         linkedin_url: form.linkedin_url || null,
-        bio: form.bio || null,
+        photo_url: form.photo_url || null,
+        photo_path: form.photo_url || null,
+        display_order: Number(form.display_order) || 0,
+        term_id: form.term_id || null,
+        status: form.status,
       }
 
       let memberId = initialData?.id
@@ -94,13 +80,6 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
       } else {
         const { error } = await supabase.from('team_members').update(payload).eq('id', memberId!)
         if (error) { setError(error.message); return }
-      }
-
-      if (photoFile && memberId) {
-        const url = await uploadPhoto(photoFile, memberId)
-        if (url) {
-          await supabase.from('team_members').update({ photo_url: url, photo_path: `team/${memberId}.${photoFile.name.split('.').pop()}` }).eq('id', memberId)
-        }
       }
 
       setSuccess(true)
@@ -159,25 +138,16 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
 
         <div className="space-y-5">
           {/* Photo upload */}
-          <div className="card p-5">
-            <h2 className="font-semibold text-[var(--color-text)] mb-4">Profile Photo</h2>
-            {photoPreview ? (
-              <div className="relative">
-                <div className="relative w-24 h-24 rounded-full overflow-hidden mx-auto mb-3">
-                  <Image src={photoPreview} alt="Preview" fill className="object-cover" />
-                </div>
-                <button type="button" onClick={() => { setPhotoPreview(null); setPhotoFile(null) }} className="flex items-center gap-1.5 mx-auto text-xs text-red-500 hover:text-red-700 transition-colors">
-                  <X className="w-3 h-3" /> Remove photo
-                </button>
-              </div>
-            ) : (
-              <label htmlFor="photo" className="flex flex-col items-center gap-2 p-6 rounded-xl border-2 border-dashed border-[var(--color-border)] hover:border-[var(--color-primary)] cursor-pointer transition-colors">
-                <Upload className="w-8 h-8 text-[var(--color-muted-light)]" />
-                <span className="text-sm text-[var(--color-muted)]">Click to upload photo</span>
-                <span className="text-xs text-[var(--color-muted-light)]">JPG, PNG · Max 5 MB</span>
-                <input id="photo" type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
-              </label>
-            )}
+          <div className="card p-5 space-y-3">
+            <h2 className="font-semibold text-[var(--color-text)]">Profile Photo</h2>
+            <ImageUpload
+              label="Member Photo"
+              value={form.photo_url}
+              onChange={url => set('photo_url', url)}
+              folder="team"
+              description="Square portrait photo (PNG, JPG, WEBP - Max 10MB)"
+              aspectRatio="square"
+            />
           </div>
 
           {/* Publish */}
@@ -209,8 +179,8 @@ export default function TeamMemberForm({ initialData, terms, mode }: MemberFormP
             </div>
 
             <div className="flex gap-2 pt-2">
-              <button type="submit" disabled={isPending || uploadingPhoto} className="btn btn-primary btn-sm flex-1 justify-center">
-                {isPending || uploadingPhoto ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : mode === 'edit' ? 'Update Member' : 'Add Member'}
+              <button type="submit" disabled={isPending} className="btn btn-primary btn-sm flex-1 justify-center">
+                {isPending ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving…</> : mode === 'edit' ? 'Update Member' : 'Add Member'}
               </button>
               <button type="button" onClick={() => router.back()} className="btn btn-outline btn-sm">Cancel</button>
             </div>

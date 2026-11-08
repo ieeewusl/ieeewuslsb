@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import fs from 'fs'
 import path from 'path'
 
@@ -32,17 +32,36 @@ export async function POST(request: NextRequest) {
 
     // 1. Try Supabase storage if available
     try {
-      const supabase = await createClient()
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('media')
-        .upload(storagePath, buffer, {
-          contentType: file.type,
-          upsert: true,
-        })
+      const supabase = process.env.SUPABASE_SERVICE_ROLE_KEY
+        ? await createServiceClient()
+        : await createClient()
 
-      if (!uploadError && uploadData) {
-        const { data: { publicUrl } } = supabase.storage.from('media').getPublicUrl(storagePath)
-        return NextResponse.json({ url: publicUrl, path: storagePath })
+      // Automatically create 'media' bucket as public if it doesn't already exist
+      if (process.env.SUPABASE_SERVICE_ROLE_KEY) {
+        try {
+          await supabase.storage.createBucket('media', { public: true })
+        } catch {
+          // Ignore if bucket already exists or cannot be created
+        }
+      }
+
+      const bucketsToTry = ['media', 'public-assets', 'uploads']
+      for (const bucketName of bucketsToTry) {
+        try {
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from(bucketName)
+            .upload(storagePath, buffer, {
+              contentType: file.type,
+              upsert: true,
+            })
+
+          if (!uploadError && uploadData) {
+            const { data: { publicUrl } } = supabase.storage.from(bucketName).getPublicUrl(storagePath)
+            return NextResponse.json({ url: publicUrl, path: storagePath })
+          }
+        } catch {
+          // Continue to next bucket if this one fails
+        }
       }
     } catch {
       // Supabase storage unavailable or unconfigured, fallback to local/data URL

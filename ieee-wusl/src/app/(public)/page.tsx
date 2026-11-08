@@ -538,20 +538,29 @@ export default async function HomePage() {
             {[team.slice(0, 3), team.slice(3, 7)].map((row, rowIndex) => row.length > 0 && (
               <div
                 key={rowIndex}
-                className="grid grid-cols-1 sm:grid-cols-4 gap-6"
+                className={`grid grid-cols-1 gap-6 ${rowIndex === 0 ? 'sm:flex sm:justify-center' : 'sm:grid-cols-4'}`}
               >
                 {row.map((member) => (
-                  <div key={member.id} className="card group flex h-full flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)]">
+                  <div key={member.id} className="card group flex h-full flex-col overflow-hidden hover:shadow-xl transition-all duration-300 border border-[var(--color-border)] sm:w-[calc((100%-4.5rem)/4)]">
                 {/* Full-size Square Photo (Badge Style) */}
                 <div className="relative aspect-square w-full overflow-hidden bg-gradient-to-br from-[var(--color-navy)] to-[var(--color-primary)]">
                   {member.photo_url ? (
                     <>
-                      <Image
-                        src={member.photo_url}
-                        alt={member.full_name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
+                      {member.photo_url.startsWith('data:') ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={member.photo_url}
+                          alt={member.full_name}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      ) : (
+                        <Image
+                          src={member.photo_url}
+                          alt={member.full_name}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
                       <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
                         <span className="px-2.5 py-1 rounded-md text-[11px] font-bold tracking-wider uppercase bg-white/95 text-[var(--color-primary)] shadow-md backdrop-blur-sm">

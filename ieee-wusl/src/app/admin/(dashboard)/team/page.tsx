@@ -66,7 +66,12 @@ export default async function AdminTeamPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-navy)] flex items-center justify-center shrink-0">
                         {member.photo_url ? (
-                          <Image src={member.photo_url} alt={member.full_name} width={32} height={32} className="object-cover w-full h-full" />
+                          member.photo_url.startsWith('data:') ? (
+                            // eslint-disable-next-line @next/next/no-img-element
+                            <img src={member.photo_url} alt={member.full_name} className="object-cover w-full h-full" />
+                          ) : (
+                            <Image src={member.photo_url} alt={member.full_name} width={32} height={32} className="object-cover w-full h-full" />
+                          )
                         ) : (
                           <span className="text-xs font-bold text-white">{getInitials(member.full_name)}</span>
                         )}
