@@ -1,7 +1,10 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { Mail, MapPin, ExternalLink, Users, ArrowRight } from 'lucide-react'
-import { LinkedinIcon, FacebookIcon, InstagramIcon, TwitterIcon } from '@/components/ui/SocialIcons'
+import { LinkedinIcon, FacebookIcon, InstagramIcon, TwitterIcon, WhatsAppIcon } from '@/components/ui/SocialIcons'
+import { createClient } from '@/lib/supabase/server'
+
+export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
   title: 'Join IEEE WUSL',
@@ -26,7 +29,22 @@ const steps = [
   { step: '04', title: 'Get Involved', desc: 'Attend events, join a technical chapter, and contribute to our community.' },
 ]
 
-export default function JoinPage() {
+export default async function JoinPage() {
+  let whatsappChannelUrl = process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || 'https://whatsapp.com/channel/'
+
+  try {
+    const supabase = await createClient()
+    const { data: settingsData } = await supabase
+      .from('site_settings')
+      .select('key, value')
+      .eq('key', 'whatsapp_channel_url')
+      .single()
+
+    if (settingsData && settingsData.value) {
+      whatsappChannelUrl = String(settingsData.value)
+    }
+  } catch {}
+
   return (
     <>
       {/* Hero */}
@@ -41,6 +59,50 @@ export default function JoinPage() {
             <p className="text-white/70 text-lg leading-relaxed">
               Become part of Sri Lanka&apos;s most vibrant engineering student community. Access global resources, build skills, and connect with tomorrow&apos;s technology leaders.
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Official WhatsApp Channel Section */}
+      <section className="py-10 bg-emerald-50/70 border-b border-emerald-100">
+        <div className="container">
+          <div className="card p-7 sm:p-9 bg-gradient-to-br from-emerald-600 via-emerald-700 to-teal-800 text-white relative overflow-hidden shadow-xl border-none">
+            {/* Background WhatsApp watermark */}
+            <div className="absolute right-0 top-0 bottom-0 w-80 opacity-10 pointer-events-none flex items-center justify-center">
+              <WhatsAppIcon size={260} />
+            </div>
+
+            <div className="relative z-10 max-w-2xl">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 text-white text-xs font-semibold uppercase tracking-wider mb-4 backdrop-blur-xs">
+                <span className="w-2 h-2 rounded-full bg-emerald-300 animate-pulse" />
+                Official Community Channel
+              </div>
+
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-white mb-3">
+                Join our Official WhatsApp Channel
+              </h2>
+
+              <p className="text-white/85 text-sm sm:text-base leading-relaxed mb-6">
+                Get real-time announcements on upcoming competitions, hands-on workshops, volunteer recruitment, chapter events, and branch opportunities directly on your WhatsApp.
+              </p>
+
+              <div className="flex flex-wrap items-center gap-4">
+                <a
+                  href={whatsappChannelUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn bg-white text-emerald-900 hover:bg-emerald-50 hover:text-emerald-950 font-bold px-5 py-3 rounded-xl shadow-lg inline-flex items-center gap-2.5 transition-all text-sm sm:text-base active:scale-95"
+                >
+                  <WhatsAppIcon size={20} className="text-emerald-600" />
+                  Follow WhatsApp Channel
+                  <ExternalLink className="w-4 h-4 ml-1 opacity-70" />
+                </a>
+
+                <span className="text-xs text-white/80 font-medium">
+                  ✓ Free to join · Open to all undergraduates
+                </span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -121,6 +183,15 @@ export default function JoinPage() {
                 <div className="border-t border-[var(--color-border)] pt-5">
                   <div className="text-xs text-[var(--color-muted)] mb-3">Find us on social media</div>
                   <div className="flex items-center gap-2">
+                    <a
+                      href={whatsappChannelUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-9 h-9 rounded-xl bg-emerald-50 hover:bg-emerald-100 flex items-center justify-center text-emerald-600 hover:text-emerald-700 transition-colors"
+                      title="Follow our WhatsApp Channel"
+                    >
+                      <WhatsAppIcon size={18} />
+                    </a>
                     {[LinkedinIcon, FacebookIcon, InstagramIcon, TwitterIcon].map((Icon, i) => (
                       <a key={i} href="#" className="w-9 h-9 rounded-xl bg-[var(--color-surface)] hover:bg-[var(--color-primary)]/10 flex items-center justify-center text-[var(--color-muted)] hover:text-[var(--color-primary)] transition-colors">
                         <Icon className="w-4 h-4" />

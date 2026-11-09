@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import GalleryAlbumForm from '@/components/admin/GalleryAlbumForm'
+import GalleryImageManager from '@/components/admin/GalleryImageManager'
 import type { GalleryAlbum, GalleryImage } from '@/types/database'
-import Image from 'next/image'
 
 export default async function EditGalleryAlbumPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -27,28 +27,8 @@ export default async function EditGalleryAlbumPage({ params }: { params: Promise
 
       <GalleryAlbumForm initialData={album} mode="edit" />
 
-      {/* Album Images Section */}
-      <div className="card p-6 space-y-4">
-        <div className="flex items-center justify-between border-b border-[var(--color-border)] pb-3">
-          <h2 className="text-base font-bold text-[var(--color-text)]">
-            Album Images ({images.length})
-          </h2>
-        </div>
-
-        {images.length === 0 ? (
-          <p className="text-sm text-[var(--color-muted)] py-4 text-center">
-            No images in this album yet. Add images via Supabase Storage or direct upload.
-          </p>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-            {images.map((img) => (
-              <div key={img.id} className="relative aspect-square rounded-xl overflow-hidden border border-[var(--color-border)] bg-slate-900">
-                <Image src={img.url} alt={img.alt_text || 'Album image'} fill className="object-cover" />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {/* Album Photos Manager */}
+      <GalleryImageManager albumId={album.id} initialImages={images} />
     </div>
   )
 }

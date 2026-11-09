@@ -194,6 +194,7 @@ export interface SiteSettings {
   stat_projects: number | null
   stat_chapters: number | null
   show_spotlight_section?: boolean
+  whatsapp_channel_url?: string | null
 }
 
 // Supabase DB type map

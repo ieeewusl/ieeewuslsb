@@ -25,6 +25,7 @@ import type { Event, Chapter, NewsArticle, TeamMember } from '@/types/database'
 import { mockEvents, mockChapters, mockNews, mockTeamMembers } from '@/lib/mock-data'
 import SpotlightSection from '@/components/public/SpotlightSection'
 import ParallaxHero from '@/components/public/ParallaxHero'
+import WhatsAppFloatingButton from '@/components/public/WhatsAppFloatingButton'
 
 export const metadata: Metadata = {
   title: 'IEEE Student Branch — Wayamba University of Sri Lanka',
@@ -112,8 +113,9 @@ async function getHomeData() {
       })
     }
     const hideSpotlight = settingsMap.show_spotlight_section === false || settingsMap.show_spotlight_section === 'false'
+    const whatsappChannelUrl = (settingsMap.whatsapp_channel_url as string) || process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || ''
 
-    return { events, chapters, news, team, hotEvents, hideSpotlight }
+    return { events, chapters, news, team, hotEvents, hideSpotlight, whatsappChannelUrl }
   } catch {
     return {
       events: isSupabaseConfigured ? [] : mockEvents.slice(0, 3),
@@ -122,6 +124,7 @@ async function getHomeData() {
       team: isSupabaseConfigured ? [] : mockTeamMembers.filter(m => (m.committee_type ?? 'executive') === 'executive').slice(0, 7),
       hotEvents: isSupabaseConfigured ? [] : mockEvents.filter(e => e.featured),
       hideSpotlight: false,
+      whatsappChannelUrl: process.env.NEXT_PUBLIC_WHATSAPP_CHANNEL_URL || '',
     }
   }
 }
@@ -237,7 +240,7 @@ function ExecutiveMemberCard({
 }
 
 export default async function HomePage() {
-  const { events, chapters, news, team, hotEvents, hideSpotlight } = await getHomeData()
+  const { events, chapters, news, team, hotEvents, hideSpotlight, whatsappChannelUrl } = await getHomeData()
 
   return (
     <>
@@ -706,6 +709,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* ── WhatsApp Floating Side Widget ── */}
+      <WhatsAppFloatingButton channelUrl={whatsappChannelUrl} />
     </>
   )
 }

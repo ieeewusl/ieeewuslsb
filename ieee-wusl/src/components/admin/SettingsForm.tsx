@@ -28,6 +28,7 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
     social_instagram: (initialSettings.social_instagram as string) || 'https://instagram.com/ieee_wusl',
     social_twitter: (initialSettings.social_twitter as string) || 'https://x.com/ieee_wusl',
     social_youtube: (initialSettings.social_youtube as string) || 'https://youtube.com/@ieeewusl',
+    whatsapp_channel_url: (initialSettings.whatsapp_channel_url as string) || '',
     stat_members: (initialSettings.stat_members as number) || 120,
     stat_events: (initialSettings.stat_events as number) || 45,
     stat_chapters: (initialSettings.stat_chapters as number) || 4,
@@ -224,6 +225,22 @@ export default function SettingsForm({ initialSettings }: SettingsFormProps) {
               className="input"
             />
           </div>
+        </div>
+
+        <div className="pt-2">
+          <label className="label font-semibold text-emerald-700 flex items-center gap-1.5">
+            Official WhatsApp Channel URL
+          </label>
+          <input
+            type="url"
+            placeholder="https://whatsapp.com/channel/0029Vb..."
+            value={settings.whatsapp_channel_url}
+            onChange={e => set('whatsapp_channel_url', e.target.value)}
+            className="input border-emerald-300 focus:border-emerald-500 focus:ring-emerald-500"
+          />
+          <span className="text-xs text-[var(--color-muted)] mt-1 block">
+            Used for the floating WhatsApp badge on the Home page and the announcement card on the Join Us page.
+          </span>
         </div>
       </div>
 

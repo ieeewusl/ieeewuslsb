@@ -4,28 +4,30 @@ import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X, ChevronDown } from 'lucide-react'
+import { Menu, X, ChevronDown, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/client'
 
-const navLinks = [
-  { label: 'Home', href: '/' },
-  { label: 'About', href: '/about' },
-  {
-    label: 'Chapters',
-    href: '/chapters',
-    children: [
-      { label: 'Computer Society', href: '/chapters/computer-society' },
-      { label: 'Robotics & Automation', href: '/chapters/robotics-automation' },
-      { label: 'Women in Engineering', href: '/chapters/women-in-engineering' },
-      { label: 'Power & Energy', href: '/chapters/power-energy' },
-    ],
-  },
-  { label: 'Events', href: '/events' },
-  { label: 'Team', href: '/team' },
-  { label: 'News', href: '/news' },
+interface ChapterItem {
+  name: string
+  slug: string
+}
+
+interface NavbarProps {
+  chapters?: ChapterItem[]
+}
+
+const defaultChapters: ChapterItem[] = [
+  { name: 'Computer Society', slug: 'computer-society' },
+  { name: 'Robotics & Automation', slug: 'robotics-automation' },
+  { name: 'Women in Engineering', slug: 'women-in-engineering' },
+  { name: 'Power & Energy', slug: 'power-energy' },
 ]
 
-export default function Navbar() {
+export default function Navbar({ chapters: initialChapters }: NavbarProps) {
+  const [chapters, setChapters] = useState<ChapterItem[]>(
+    initialChapters && initialChapters.length > 0 ? initialChapters : defaultChapters
+  )
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<string | null>(null)
@@ -37,6 +39,49 @@ export default function Navbar() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  useEffect(() => {
+    if (initialChapters && initialChapters.length > 0) {
+      setChapters(initialChapters)
+      return
+    }
+
+    async function loadChapters() {
+      try {
+        const supabase = createClient()
+        const { data } = await supabase
+          .from('chapters')
+          .select('name, slug')
+          .eq('status', 'published')
+          .order('display_order', { ascending: true })
+
+        if (data && data.length > 0) {
+          setChapters(data)
+        }
+      } catch {}
+    }
+
+    loadChapters()
+  }, [initialChapters])
+
+  const chapterChildren = (chapters.length > 0 ? chapters : defaultChapters).map((c) => ({
+    label: c.name.replace(/ Student Branch Chapter$/i, '').replace(/ Affinity Group$/i, ''),
+    href: `/chapters/${c.slug}`,
+  }))
+
+  const navLinks = [
+    { label: 'Home', href: '/' },
+    { label: 'About', href: '/about' },
+    {
+      label: 'Chapters',
+      href: '/chapters',
+      children: chapterChildren,
+    },
+    { label: 'Events', href: '/events' },
+    { label: 'Gallery', href: '/gallery' },
+    { label: 'Team', href: '/team' },
+    { label: 'News', href: '/news' },
+  ]
 
   const [prevPathname, setPrevPathname] = useState(pathname)
   if (prevPathname !== pathname) {
@@ -120,11 +165,20 @@ export default function Navbar() {
                       />
                     </button>
                     {activeDropdown === link.label && (
-                      <div className="absolute top-full left-0 mt-2 w-60 bg-white rounded-xl shadow-xl border border-[var(--color-border)] py-2 z-50 animate-in fade-in-0 zoom-in-95">
+                      <div className="absolute top-full left-0 mt-2 w-64 bg-white rounded-xl shadow-xl border border-[var(--color-border)] py-2 z-50 animate-in fade-in-0 zoom-in-95">
+                        <Link
+                          href="/chapters"
+                          onClick={() => setActiveDropdown(null)}
+                          className="flex items-center justify-between px-4 py-2 text-xs font-bold uppercase tracking-wider text-[var(--color-primary)] hover:bg-blue-50/70 border-b border-[var(--color-border)] mb-1"
+                        >
+                          <span>All Chapters & Groups</span>
+                          <span>→</span>
+                        </Link>
                         {link.children.map((child) => (
                           <Link
                             key={child.href}
                             href={child.href}
+                            onClick={() => setActiveDropdown(null)}
                             className={cn(
                               'flex items-center gap-2.5 px-4 py-2.5 text-[15px] font-medium transition-colors hover:bg-[var(--color-surface)] hover:text-[var(--color-primary)]',
                               isActive(child.href)
