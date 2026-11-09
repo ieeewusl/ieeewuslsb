@@ -6,6 +6,7 @@ import { LinkedinIcon } from '@/components/ui/SocialIcons'
 import { createClient } from '@/lib/supabase/server'
 import { getInitials } from '@/lib/utils'
 import type { TeamMember, CommitteeTerm } from '@/types/database'
+import BioExpandable from '@/components/public/BioExpandable'
 
 export const metadata: Metadata = {
   title: 'Executive Committee',
@@ -267,18 +268,17 @@ function MemberCard({ member }: { member: TeamMember }) {
 
       {/* Name Tag & Bio */}
       <div className="p-5 flex flex-col flex-1 bg-[var(--color-card)]">
-        <h3 className="font-bold text-[var(--color-text)] text-base group-hover:text-[var(--color-primary)] transition-colors line-clamp-1 mb-1">
+        <h3
+          className="font-bold text-[var(--color-text)] text-base group-hover:text-[var(--color-primary)] transition-colors line-clamp-2 leading-snug mb-1"
+          title={member.full_name}
+        >
           {member.full_name}
         </h3>
         <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider mb-2">
           {member.role_title}
         </p>
 
-        {member.bio && (
-          <p className="text-xs text-[var(--color-muted)] line-clamp-2 leading-relaxed mb-4 flex-1">
-            {member.bio}
-          </p>
-        )}
+        {member.bio && <BioExpandable bio={member.bio} />}
 
         <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between mt-auto">
           <span className="text-[11px] font-medium text-[var(--color-muted)]">

@@ -26,9 +26,10 @@ async function getArticles(): Promise<Partial<NewsArticle>[]> {
     const supabase = await createClient()
     const { data, error } = await supabase
       .from('news_articles')
-      .select('id,title,slug,summary,cover_url,published_at,tags,author_name')
+      .select('id,title,slug,summary,cover_url,published_at,tags,author_name,featured,created_at')
       .eq('status', 'published')
-      .order('published_at', { ascending: false })
+      .order('published_at', { ascending: false, nullsFirst: false })
+      .order('created_at', { ascending: false })
 
     if (isSupabaseConfigured && !error && data) {
       return data
@@ -42,7 +43,20 @@ async function getArticles(): Promise<Partial<NewsArticle>[]> {
 
 export default async function NewsPage() {
   const articles = await getArticles()
-  const [featured, ...rest] = articles
+
+  // Sort articles strictly by newest date first
+  const sortedArticles = [...articles].sort((a, b) => {
+    const timeA = new Date(a.published_at || (a as { created_at?: string }).created_at || 0).getTime()
+    const timeB = new Date(b.published_at || (b as { created_at?: string }).created_at || 0).getTime()
+    return timeB - timeA
+  })
+
+  // Feature an explicitly pinned article, or fallback to the newest article
+  const featuredIndex = sortedArticles.findIndex(a => a.featured)
+  const featured = featuredIndex !== -1 ? sortedArticles[featuredIndex] : sortedArticles[0]
+  const rest = featuredIndex !== -1
+    ? sortedArticles.filter((_, idx) => idx !== featuredIndex)
+    : sortedArticles.slice(1)
 
   return (
     <>
@@ -94,10 +108,10 @@ export default async function NewsPage() {
                       <p className="text-[var(--color-muted)] leading-relaxed mb-5 line-clamp-3">{featured.summary}</p>
                     )}
                     <div className="flex items-center gap-4 text-sm text-[var(--color-muted-light)]">
-                      {featured.published_at && (
+                      {(featured.published_at || (featured as { created_at?: string }).created_at) && (
                         <span className="flex items-center gap-1.5">
                           <Calendar className="w-3.5 h-3.5" />
-                          {formatDate(featured.published_at)}
+                          {formatDate(featured.published_at || (featured as { created_at?: string }).created_at!)}
                         </span>
                       )}
                       {featured.author_name && <span>By {featured.author_name}</span>}
@@ -134,10 +148,10 @@ export default async function NewsPage() {
                           <p className="text-sm text-[var(--color-muted)] line-clamp-3 flex-1">{article.summary}</p>
                         )}
                         <div className="flex items-center gap-3 mt-4 text-xs text-[var(--color-muted-light)]">
-                          {article.published_at && (
+                          {(article.published_at || (article as { created_at?: string }).created_at) && (
                             <span className="flex items-center gap-1.5">
                               <Calendar className="w-3 h-3" />
-                              {formatDate(article.published_at)}
+                              {formatDate(article.published_at || (article as { created_at?: string }).created_at!)}
                             </span>
                           )}
                           {article.author_name && <span>· {article.author_name}</span>}

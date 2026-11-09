@@ -29,6 +29,9 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
     tags: (initialData?.tags ?? []).join(', '),
     status: (initialData?.status ?? 'draft') as PublicationStatus,
     featured: initialData?.featured ?? false,
+    published_at: initialData?.published_at
+      ? new Date(initialData.published_at).toISOString().slice(0, 16)
+      : new Date().toISOString().slice(0, 16),
   })
 
   function set(field: string, value: unknown) {
@@ -42,6 +45,12 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
     startTransition(async () => {
       const supabase = createClient()
       const tags = form.tags.split(',').map(t => t.trim()).filter(Boolean)
+      const publishedAtValue = form.published_at
+        ? new Date(form.published_at).toISOString()
+        : form.status === 'published'
+        ? new Date().toISOString()
+        : null
+
       const payload = {
         title: form.title,
         slug: form.slug,
@@ -52,6 +61,7 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
         tags,
         status: form.status,
         featured: form.featured,
+        published_at: publishedAtValue,
       }
 
       let err
@@ -154,9 +164,36 @@ export default function NewsForm({ initialData, mode }: NewsFormProps) {
               </select>
             </div>
 
-            <div className="flex items-center gap-3">
-              <input id="featured" type="checkbox" checked={form.featured} onChange={e => set('featured', e.target.checked)} className="w-4 h-4 rounded accent-[var(--color-primary)] cursor-pointer" />
-              <label htmlFor="featured" className="text-sm font-medium text-[var(--color-text)] cursor-pointer">Feature on homepage</label>
+            <div>
+              <label className="label" htmlFor="published_at">Publication Date & Time</label>
+              <input
+                id="published_at"
+                type="datetime-local"
+                value={form.published_at}
+                onChange={e => set('published_at', e.target.value)}
+                className="input text-sm"
+              />
+              <p className="text-xs text-[var(--color-muted)] mt-1">Articles are sorted by this date (newest date appears first).</p>
+            </div>
+
+            <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200/60">
+              <div className="flex items-start gap-2.5">
+                <input
+                  id="featured"
+                  type="checkbox"
+                  checked={form.featured}
+                  onChange={e => set('featured', e.target.checked)}
+                  className="w-4 h-4 mt-0.5 rounded accent-[var(--color-accent)] cursor-pointer shrink-0"
+                />
+                <div>
+                  <label htmlFor="featured" className="text-sm font-semibold text-amber-950 cursor-pointer block leading-tight">
+                    Feature on homepage
+                  </label>
+                  <p className="text-xs text-amber-900/70 mt-0.5 leading-snug">
+                    Pins this article to the top of the Homepage news section.
+                  </p>
+                </div>
+              </div>
             </div>
 
             <div className="flex gap-2 pt-2">

@@ -26,6 +26,7 @@ import { mockEvents, mockChapters, mockNews, mockTeamMembers } from '@/lib/mock-
 import SpotlightSection from '@/components/public/SpotlightSection'
 import ParallaxHero from '@/components/public/ParallaxHero'
 import WhatsAppFloatingButton from '@/components/public/WhatsAppFloatingButton'
+import BioExpandable from '@/components/public/BioExpandable'
 
 export const metadata: Metadata = {
   title: 'IEEE Student Branch — Wayamba University of Sri Lanka',
@@ -59,10 +60,12 @@ async function getHomeData() {
         .order('display_order', { ascending: true }),
       supabase
         .from('news_articles')
-        .select('id,title,slug,summary,cover_url,published_at,tags')
+        .select('id,title,slug,summary,cover_url,published_at,tags,featured,created_at')
         .eq('status', 'published')
-        .order('published_at', { ascending: false })
-        .limit(3),
+        .order('featured', { ascending: false })
+        .order('published_at', { ascending: false, nullsFirst: false })
+        .order('created_at', { ascending: false })
+        .limit(6),
       supabase
         .from('team_members')
         .select('*')
@@ -88,9 +91,19 @@ async function getHomeData() {
       ? (chaptersRes.data as Chapter[])
       : (chaptersRes.data && chaptersRes.data.length > 0) ? (chaptersRes.data as Chapter[]) : mockChapters
 
-    const news = isSupabaseConfigured && !newsRes.error && newsRes.data
-      ? (newsRes.data as Partial<NewsArticle>[])
-      : (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as Partial<NewsArticle>[]) : mockNews.slice(0, 3)
+    const rawNews = isSupabaseConfigured && !newsRes.error && newsRes.data
+      ? (newsRes.data as (Partial<NewsArticle> & { created_at?: string })[])
+      : (newsRes.data && newsRes.data.length > 0) ? (newsRes.data as (Partial<NewsArticle> & { created_at?: string })[]) : mockNews.slice(0, 3)
+
+    // Prioritize featured articles on homepage, and order strictly by date (newest first)
+    const news = [...rawNews].sort((a, b) => {
+      const aFeatured = Boolean(a.featured)
+      const bFeatured = Boolean(b.featured)
+      if (aFeatured !== bFeatured) return aFeatured ? -1 : 1
+      const timeA = new Date(a.published_at || a.created_at || 0).getTime()
+      const timeB = new Date(b.published_at || b.created_at || 0).getTime()
+      return timeB - timeA
+    }).slice(0, 3)
 
     const allMembers = isSupabaseConfigured && !teamRes.error && teamRes.data
       ? (teamRes.data as TeamMember[])
@@ -194,18 +207,17 @@ function ExecutiveMemberCard({
 
       {/* Name Tag & Details */}
       <div className="p-5 flex flex-col flex-1 bg-[var(--color-card)]">
-        <h3 className="font-bold text-[var(--color-text)] text-base group-hover:text-[var(--color-primary)] transition-colors line-clamp-1 mb-1">
+        <h3
+          className="font-bold text-[var(--color-text)] text-base group-hover:text-[var(--color-primary)] transition-colors line-clamp-2 leading-snug mb-1"
+          title={member.full_name}
+        >
           {member.full_name}
         </h3>
         <p className="text-xs font-semibold text-[var(--color-primary)] uppercase tracking-wider mb-2">
           {member.role_title}
         </p>
 
-        {member.bio && (
-          <p className="text-xs text-[var(--color-muted)] line-clamp-2 leading-relaxed mb-4 flex-1">
-            {member.bio}
-          </p>
-        )}
+        {member.bio && <BioExpandable bio={member.bio} />}
 
         <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between mt-auto">
           <span className="text-[11px] font-medium text-[var(--color-muted)]">
@@ -588,6 +600,11 @@ export default async function HomePage() {
                     fill
                     className="object-cover group-hover:scale-105 transition-transform duration-500"
                   />
+                  {article.featured && (
+                    <div className="absolute top-3 left-3">
+                      <span className="badge badge-accent shadow-md">Featured</span>
+                    </div>
+                  )}
                 </div>
                 <div className="p-6 flex-1 flex flex-col">
                   {article.tags && article.tags.length > 0 && (
@@ -609,7 +626,13 @@ export default async function HomePage() {
                   </p>
 
                   <div className="pt-3 border-t border-[var(--color-border)] flex items-center justify-between text-xs text-[var(--color-muted)]">
-                    <span>{article.published_at ? formatDate(article.published_at) : ''}</span>
+                    <span>
+                      {article.published_at
+                        ? formatDate(article.published_at)
+                        : (article as { created_at?: string }).created_at
+                        ? formatDate((article as { created_at?: string }).created_at!)
+                        : ''}
+                    </span>
                     <Link
                       href={`/news/${article.slug}`}
                       className="font-semibold text-[var(--color-primary)] hover:underline inline-flex items-center gap-1"

@@ -14,7 +14,8 @@ async function getArticles(): Promise<Partial<NewsArticle>[]> {
   const supabase = await createClient()
   const { data } = await supabase
     .from('news_articles')
-    .select('id,title,slug,status,published_at,author_name')
+    .select('id,title,slug,status,published_at,author_name,featured,created_at')
+    .order('published_at', { ascending: false, nullsFirst: false })
     .order('created_at', { ascending: false })
   return data ?? []
 }
@@ -59,12 +60,21 @@ export default async function AdminNewsPage() {
               {articles.map(article => (
                 <tr key={article.id} className="hover:bg-[var(--color-surface)] transition-colors">
                   <td className="px-4 py-3.5">
-                    <div className="font-medium text-[var(--color-text)] line-clamp-1">{article.title}</div>
+                    <div className="flex items-center gap-2">
+                      <span className="font-medium text-[var(--color-text)] line-clamp-1">{article.title}</span>
+                      {article.featured && (
+                        <span className="badge badge-accent text-[10px] px-2 py-0.5 shrink-0">Featured</span>
+                      )}
+                    </div>
                     <div className="text-xs text-[var(--color-muted-light)] mt-0.5">{article.slug}</div>
                   </td>
                   <td className="px-4 py-3.5 hidden md:table-cell text-[var(--color-muted)]">{article.author_name ?? '—'}</td>
                   <td className="px-4 py-3.5 hidden lg:table-cell text-[var(--color-muted)]">
-                    {article.published_at ? formatDate(article.published_at) : '—'}
+                    {article.published_at
+                      ? formatDate(article.published_at)
+                      : (article as { created_at?: string }).created_at
+                      ? `${formatDate((article as { created_at?: string }).created_at!)} (Draft)`
+                      : '—'}
                   </td>
                   <td className="px-4 py-3.5">
                     <AdminStatusToggle id={article.id!} table="news_articles" currentStatus={article.status!} />
