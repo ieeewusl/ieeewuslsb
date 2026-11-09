@@ -366,7 +366,7 @@ export default async function HomePage() {
                 </div>
                 <div>
                   <div className="text-xs text-[var(--color-muted)] uppercase tracking-wider">WUSL</div>
-                  <div className="font-bold text-[var(--color-text)]">Active SB Community</div>
+                  <div className="font-bold text-[var(--color-text)]">IEEE Student Branch</div>
                 </div>
               </div>
               {/* Accent decoration */}
