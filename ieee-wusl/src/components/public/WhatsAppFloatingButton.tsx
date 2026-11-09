@@ -12,36 +12,30 @@ export default function WhatsAppFloatingButton({
   const url = channelUrl && channelUrl.trim().length > 0 ? channelUrl : 'https://whatsapp.com/channel/'
 
   return (
-    <aside aria-label="Official WhatsApp Channel Link" className="fixed bottom-6 left-6 z-40">
+    <aside aria-label="Official WhatsApp Channel Link" className="fixed bottom-20 right-6 z-40">
       <a
         href={url}
         target="_blank"
         rel="noopener noreferrer"
         aria-label="Join our official WhatsApp Channel"
-        className="group relative flex items-center gap-2.5 px-4 py-3 sm:px-4.5 sm:py-3.5 rounded-full bg-[#25D366] text-white shadow-xl hover:shadow-2xl hover:bg-[#20ba5a] hover:scale-105 active:scale-95 transition-all duration-300 cursor-pointer border border-white/25 focus:outline-none focus:ring-4 focus:ring-emerald-400/40"
+        className="group relative flex items-center justify-center w-11 h-11 rounded-full bg-gradient-to-tr from-[#1DA851] via-[#25D366] to-[#2BE873] text-white shadow-lg shadow-emerald-600/30 hover:shadow-xl hover:shadow-emerald-600/45 hover:scale-110 active:scale-95 transition-all duration-300 cursor-pointer border border-white/25 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:ring-offset-2"
       >
-        {/* Pulsing online badge */}
-        <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5">
+        {/* Subtle live indicator badge */}
+        <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-300 opacity-75" />
-          <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-400 border-2 border-white" />
+          <span className="relative inline-flex rounded-full h-3 w-3 bg-white border border-emerald-500" />
         </span>
 
-        {/* WhatsApp Icon */}
-        <div className="flex items-center justify-center shrink-0">
-          <WhatsAppIcon size={22} className="text-white drop-shadow-xs" />
-        </div>
+        {/* Modern WhatsApp Icon */}
+        <WhatsAppIcon size={22} className="text-white drop-shadow-xs" />
 
-        {/* Text */}
-        <div className="flex flex-col text-left leading-none">
-          <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-950/70 hidden sm:block">
-            Official Channel
-          </span>
-          <span className="text-xs sm:text-[13px] font-extrabold tracking-tight text-white drop-shadow-xs">
-            Join WhatsApp Channel
-          </span>
+        {/* Modern floating tooltip label */}
+        <div className="pointer-events-none absolute right-full mr-3 top-1/2 -translate-y-1/2 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#071A2B]/95 text-white text-xs font-semibold shadow-xl border border-white/10 backdrop-blur-md opacity-0 -translate-x-1.5 group-hover:opacity-100 group-hover:translate-x-0 transition-all duration-200 whitespace-nowrap">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#25D366] inline-block animate-pulse" />
+          <span>Join WhatsApp Channel</span>
+          <span className="absolute left-full top-1/2 -translate-y-1/2 border-4 border-transparent border-l-[#071A2B]/95" />
         </div>
       </a>
     </aside>
   )
 }
-
